@@ -1,0 +1,460 @@
+POST http://127.0.0.1:8000/login/
+Content-Type: application/json
+
+{"username":"Kamel" ,  "password":"1234"}
+
+
+###
+### اختبار عرض التمارين حسب العضلة
+
+GET http://127.0.0.1:8000/exercises/by-muscle/?q=arm
+Accept: application/json
+###
+
+###
+
+POST http://127.0.0.1:8000/register/
+Content-Type: application/json
+
+{"username":"moff" , "email":"moff@gmail.com" , "password":"1234","phone":"1234", "weight":70.9,"height":180.6,"first_name":"K","last_name":"ah",
+"gender":"male",
+"goal":"lose_weight",
+"experianse_level" :"advanced",
+"user_type":"trainer"
+}
+
+###
+
+GET http://127.0.0.1:8000/getInfo/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+###
+DELETE http://127.0.0.1:8000/delete/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE5MzM1LCJpYXQiOjE3MzQ5ODMzMzUsImp0aSI6ImY5MGY2ZTg2N2UxYTQyZTY5MDk0NGJhYjQwMzQxNzNhIiwidXNlcl9pZCI6ODR9.84RAQq57eOJBk8_n6QO1y4ClTD1XqzrrGBYVLKMsokY
+
+{}
+
+
+###
+
+Put http://127.0.0.1:8000/update_profile/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{
+    "field": "email",
+    "value": "koko"
+}
+
+###
+
+GET http://127.0.0.1:8000/users/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+###
+
+GET http://127.0.0.1:8000/coaches/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+###
+
+GET http://127.0.0.1:8000/user/2/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+
+###
+
+GET http://127.0.0.1:8000/trainers/2/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+
+###
+
+POST http://127.0.0.1:8000/sendjoinrequest/4/2/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+
+
+###
+
+POST http://127.0.0.1:8000/responsetojoinrequest/2/2/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{
+    "action": "Accept"
+}
+
+###
+
+GET http://127.0.0.1:8000/getjoinrequests/2/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+
+
+###
+
+GET http://127.0.0.1:8000/exercises/listexercises/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+###
+
+GET http://127.0.0.1:8000/exercises/searchexercises/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+###
+
+POST http://127.0.0.1:8000/exercises/makeprogram/coach_id/trainer_id/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{
+}
+
+###
+
+GET http://127.0.0.1:8000/exercises/gettrainerprogram/trainner_id/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+###
+
+DELETE http://127.0.0.1:8000/exercises/deleteprogram/user_id/program_id/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+
+###
+
+GET http://127.0.0.1:8000/exercises/updateprogram/coach_id/program_id/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+
+###
+
+GET http://127.0.0.1:8000/exercises/getcoachprograms/2/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+
+###
+
+POST http://127.0.0.1:8000/posts/addpost/6/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3OTE4Nzk4LCJpYXQiOjE3NDYzODI3OTgsImp0aSI6ImU2Y2Y3NWYwNDEyMzQ0M2E5ZGVkMWVjYjQ1OGQxMDE3IiwidXNlcl9pZCI6Nn0.ROSJczURBaOQ5LnOQflofcbePdvRJiUWoJk3TJ5E85c
+
+{
+    "content":"hello"
+}
+
+###
+
+POST http://127.0.0.1:8000/posts/addcomment/1/6/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{
+    "text":"my post"
+}
+
+###
+
+POST http://127.0.0.1:8000/posts/like/post_id/user_id/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+###
+
+GET http://127.0.0.1:8000/posts/getallposts/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+###
+
+GET http://127.0.0.1:8000/posts/getcommentsonpost/1/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
+
+{}
+
+###
+
+Post http://127.0.0.1:8000/posts/addpost/6/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3OTE4Nzk4LCJpYXQiOjE3NDYzODI3OTgsImp0aSI6ImU2Y2Y3NWYwNDEyMzQ0M2E5ZGVkMWVjYjQ1OGQxMDE3IiwidXNlcl9pZCI6Nn0.ROSJczURBaOQ5LnOQflofcbePdvRJiUWoJk3TJ5E85c
+
+{
+  "content":"test time"
+}
+
+###
+
+###
+GET http://127.0.0.1:8000/health/healthy-meals/
+Content-Type: application/json
+
+{}
+
+###
+GET  http://127.0.0.1:8000/health/getmealbyname/?q=Meal1
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+{}
+
+###
+GET  http://127.0.0.1:8000/health/meal_time/?q=first meal
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+{}
+
+###
+GET http://127.0.0.1:8000/health/foods/
+Content-Type: application/json
+
+{}
+
+###
+POST http://127.0.0.1:8000/health/addditeplan/7/4/
+Content-Type: application/json
+
+{
+    "meals":[1,2]
+}
+
+###
+GET http://127.0.0.1:8000/health/coachdietplans/7/
+Content-Type: application/json
+
+{}
+
+###
+GET http://127.0.0.1:8000/health/gettrainerdietplan/4/
+Content-Type: application/json
+
+{}
+
+###
+POST http://127.0.0.1:8000/health/updatedietplan/1/1/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+{
+    "meals":[1,2]
+}
+
+###
+GET http://127.0.0.1:8000/health/listofretaurant/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+{}
+
+###
+POST http://127.0.0.1:8000/health/ordermeals/3/1/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+{
+    "meals":[
+        {
+            "meal":1,
+            "quantity":3
+        }
+    ]
+}
+
+###
+PATCH  http://127.0.0.1:8000/health/updateorderstatus/2/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+{
+    "status":"done"
+}
+
+###
+GET  http://127.0.0.1:8000/health/getuserorders/3/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+{}
+
+###
+POST  http://127.0.0.1:8000/health/create_restaurant/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+{
+    "name":"Restaurant3",
+    "location":"Damascus"
+}
+
+
+###
+POST  http://127.0.0.1:8000/health/add_food/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+{
+    "name":"healthy soap",
+    "calories":"75"
+}
+
+###
+DELETE http://127.0.0.1:8000/health/delete-restaurants/3/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+###
+POST  http://127.0.0.1:8000/health/create_meal/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY4NzM1NDE1LCJpYXQiOjE3MzcxOTk0MTUsImp0aSI6IjMzNTA5YmVhMGQ4ODRkMGNhYjkyYWQxZDNkZjVkOTQ2IiwidXNlcl9pZCI6ODF9.RuWWcpu8GLnN-Wtb02dA15czQ0-khbM18SzkLO4fR7A
+
+{
+    "name":"meal7",
+    "description":"meal7",
+    "ingredients":[1,2],
+    "price":"150",
+    "restaurant":[1,2]
+}
+
+###
+GET http://127.0.0.1:8000/health/restaurants_meal/1/
+Content-Type: application/json
+
+{}
+
+###
+GET http://127.0.0.1:8000/health/meals_in_restaurant/1/
+Content-Type: application/json
+
+{}
+
+###
+GET http://127.0.0.1:8000/getgoals/
+Content-Type: application/json
+
+{}
+
+###
+GET http://127.0.0.1:8000/getexperincelevel/
+Content-Type: application/json
+
+{}
+
+###
+GET http://127.0.0.1:8000/getrequeststatus/1/
+Content-Type: application/json
+
+{}
+
+###
+GET http://127.0.0.1:8000/gettrainerinfo/1/2/
+Content-Type: application/json
+
+{}
+
+###
+Post http://127.0.0.1:8000/exercises/makeprogram/2/1/
+Content-Type: application/json
+
+{
+    "description":"first program",
+    "days_exercises":[
+        { 
+            "day":"sunday",
+            "sets":3,
+            "reps":10,
+            "exercises":[1,2,3] 
+        },
+        {
+            "day":"friday",
+            "sets":3,
+            "reps":10,
+            "exercises":[1,2,3] 
+        }
+    ]
+}
+
+###
+Get http://127.0.0.1:8000/exercises/get_diet_plan/4/
+Content-Type: application/json
+
+{
+    
+}

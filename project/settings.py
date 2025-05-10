@@ -45,9 +45,20 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'posts',
     'exercises',
-    'health'
+    'health',
+    'chatapp',
+    'channels'
 
 ]
+ASGI_APPLICATION = 'your_project_name.asgi.application'
+
+# Use in-memory channel layer for now (for production you’d want Redis)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',

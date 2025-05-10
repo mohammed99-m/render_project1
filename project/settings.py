@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'channels'
 
 ]
-ASGI_APPLICATION = 'your_project_name.asgi.application'
+
+ASGI_APPLICATION = "project.asgi.application"
 
 # Use in-memory channel layer for now (for production you’d want Redis)
 CHANNEL_LAYERS = {

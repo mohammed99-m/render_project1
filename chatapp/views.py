@@ -9,7 +9,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 @api_view(["POST"])
-def SendMessageView(request):
+def SendMessageView(request,user_id):
     print("K" * 50)
     serializer = MessageSerializer(data=request.data)
     if serializer.is_valid():
@@ -17,7 +17,7 @@ def SendMessageView(request):
 
         # Step 1: Call external server using urllib
         external_data = {}
-        url = "https://mohammedmoh.pythonanywhere.com/user/1/"
+        url = "https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
         try:
             print("H" * 50)
             with urllib.request.urlopen(url) as response:

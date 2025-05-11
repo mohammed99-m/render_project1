@@ -11,13 +11,16 @@ from channels.layers import get_channel_layer
 @api_view(["POST"])
 def SendMessageView(request,user_id):
     print("K" * 50)
+    print(user_id)
+    key = str(user_id)
+    print(key)
     serializer = MessageSerializer(data=request.data)
     if serializer.is_valid():
         message = serializer.save()
 
         # Step 1: Call external server using urllib
         external_data = {}
-        url = "https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
+        url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
         try:
             print("H" * 50)
             with urllib.request.urlopen(url) as response:

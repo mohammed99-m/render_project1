@@ -72,15 +72,17 @@ def like_on_post(request, post_id, user_id):
         post.like.add(profile) 
         notification_message = f"{profile.user.username} liked your post."
         
-        notification_url = f"http://http://rende-project-qyk2.onrender.com/notification/send-notifications/{user_id}/"
+        notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications/{author_id}/"
         notification_data = {
-            'message': notification_message,
+            'content': notification_message,
             'user_id': author_id,
             'room_name': f'post_{post_id}'
         }
 
         response = requests.post(notification_url, json=notification_data)
+        print("Response from notification endpoint:", response.status_code, response.text)
 
+        print(f" Notification to user {author_id}: {notification_message}")
         if response.status_code == 201:
             return Response({"message": "You liked the post and notification sent."}, status=status.HTTP_201_CREATED)
         else:

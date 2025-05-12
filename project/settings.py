@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'exercises',
     'health',
     'chatapp',
-    'channels'
+    'channels',
+    'notification'
 
 ]
 

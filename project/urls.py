@@ -24,5 +24,6 @@ urlpatterns = [
     path('posts/',include('posts.urls')),
     path('exercises/',include('exercises.urls')),
     path('health/',include('health.urls')),
-    path('chat/',include('chatapp.urls'))
+    path('chat/',include('chatapp.urls')),
+    path('notification/', include('notification.urls'))
 ]

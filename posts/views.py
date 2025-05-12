@@ -7,6 +7,9 @@ from .serializers import PostSerializer,CommentSerializer
 from accounts.serializers import ProfileSerializer
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from notification.consumers import Notification
+import requests
+
 @api_view(['POST'])
 def add_post(request,author_id):
     content = request.data.get('content')  
@@ -52,19 +55,37 @@ def get_someone_posts(request,user_id):
 def like_on_post(request, post_id, user_id):
     try:
         post = Post.objects.get(id=post_id)
+        print(post)
         profile = Profile.objects.get(user__id=user_id)
     except Post.DoesNotExist:
         return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
     except Profile.DoesNotExist:
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
-
+    author_id = post.author.user_id
+    print("kkkk")
+    print(post.author.user_id)
+    author=post.author
     if profile in post.like.all():  
         post.like.remove(profile)
         return Response({"message": "You unliked the post."})
     else:
         post.like.add(profile) 
-        return Response({"message": "You liked the post."})
+        notification_message = f"{profile.user.username} liked your post."
+        
+        notification_url = f"http://http://rende-project-qyk2.onrender.com/notification/send-notifications/{user_id}/"
+        notification_data = {
+            'message': notification_message,
+            'user_id': author_id,
+            'room_name': f'post_{post_id}'
+        }
 
+        response = requests.post(notification_url, json=notification_data)
+
+        if response.status_code == 201:
+            return Response({"message": "You liked the post and notification sent."}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"message": "You liked the post, but failed to send notification."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 @api_view(['post'])
 def add_comment(request,post_id,user_id):

@@ -1,14 +1,15 @@
+import json
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+import urllib
 from .models import Post, Profile,Comment
 from .serializers import PostSerializer,CommentSerializer
 from accounts.serializers import ProfileSerializer
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from notification.consumers import Notification
-import requests
 
 @api_view(['POST'])
 def add_post(request,author_id):
@@ -79,7 +80,12 @@ def like_on_post(request, post_id, user_id):
             'room_name': f'post_{post_id}'
         }
 
-        response = requests.post(notification_url, json=notification_data)
+        try:
+            print("H" * 50)
+            with urllib.request.urlopen(notification_url,json=notification_data) as response:
+                external_data = json.load(response)
+        except Exception as e:
+            external_data = {"error": str(e)}
 
         if response.status_code == 201:
             return Response({"message": "You liked the post and notification sent."}, status=status.HTTP_201_CREATED)

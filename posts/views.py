@@ -51,47 +51,67 @@ def get_someone_posts(request,user_id):
 
     return Response(serializer.data)
 
+import json
+import urllib.request
+import urllib.error
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
 @api_view(['POST'])
 def like_on_post(request, post_id, user_id):
+    like_post_url = f"https://mohammedmoh.pythonanywhere.com/posts/like/{post_id}/{user_id}/"
+    send_notification_url = f"https://mohammedmoh.pythonanywhere.com/send-notifications/{user_id}/"
+
     try:
-        post = Post.objects.get(id=post_id)
-        print(post)
-        profile = Profile.objects.get(user__id=user_id)
-    except Post.DoesNotExist:
-        return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
-    except Profile.DoesNotExist:
-        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
-    author_id = post.author.user_id
-    print("kkkk")
-    print(post.author.user_id)
-    author=post.author
-    if profile in post.like.all():  
-        post.like.remove(profile)
-        return Response({"message": "You unliked the post."})
-    else:
-        post.like.add(profile) 
-        notification_message = f"{profile.user.username} liked your post."
-        
-        notification_url = f"http://rende-project-qyk2.onrender.com/notification/send-notifications/{user_id}/"
-        notification_data = {
-            'message': notification_message,
-            'user_id': author_id,
-            'room_name': f'post_{post_id}'
-        }
+        # Send POST request to like the post
+        req = urllib.request.Request(like_post_url, method='POST')
+        with urllib.request.urlopen(req) as response:
+            if response.status == 201:
+                data = response.read().decode('utf-8')
+                result = json.loads(data)
+                action = result.get('message')
+                if action == 'like':
+                    print("You liked the post.")
 
-        try:
-            print("H" * 50)
-            with urllib.request.urlopen(notification_url,json=notification_data) as response:
-                external_data = json.load(response)
-        except Exception as e:
-            external_data = {"error": str(e)}
+                    # Send GET request to notification URL
+                    try:
+                        with urllib.request.urlopen(send_notification_url) as notify_response:
+                            if notify_response.status == 200:
+                                return Response(
+                                    {"message": "You liked the post and notification sent."},
+                                    status=status.HTTP_201_CREATED
+                                )
+                            else:
+                                return Response(
+                                    {"message": "You liked the post, but failed to send notification."},
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                                )
+                    except urllib.error.HTTPError as e:
+                        return Response(
+                            {"message": "You liked the post, but failed to send notification.", "error": str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                        )
 
-        if response.status_code == 201:
-            return Response({"message": "You liked the post and notification sent."}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({"message": "You liked the post, but failed to send notification."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+                elif action == 'dislike':
+                    print("You disliked the post.")
+                    return Response({"message": "You disliked the post."}, status=status.HTTP_200_OK)
+
+                else:
+                    return Response({"message": "Unknown action received."}, status=status.HTTP_200_OK)
+
+            else:
+                return Response({"message": "Failed to like the post."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    except urllib.error.HTTPError as e:
+        return Response({"error": f"HTTP Error: {e.code} - {e.reason}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except urllib.error.URLError as e:
+        return Response({"error": f"URL Error: {e.reason}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 
 @api_view(['post'])
 def add_comment(request,post_id,user_id):

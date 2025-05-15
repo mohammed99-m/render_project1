@@ -61,8 +61,7 @@ from rest_framework import status
 @api_view(['POST'])
 def like_on_post(request, post_id, user_id):
     like_post_url = f"https://mohammedmoh.pythonanywhere.com/posts/like/{post_id}/{user_id}/"
-    send_notification_url = f"https://mohammedmoh.pythonanywhere.com/send-notifications/{user_id}/"
-
+    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications/{user_id}/"
     try:
         # Send POST request to like the post
         req = urllib.request.Request(like_post_url, method='POST')
@@ -101,7 +100,7 @@ def like_on_post(request, post_id, user_id):
                     return Response({"message": "Unknown action received."}, status=status.HTTP_200_OK)
 
             else:
-                return Response({"message": "Failed to like the post."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({"message": f"Failed to like the post"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     except urllib.error.HTTPError as e:
         return Response({"error": f"HTTP Error: {e.code} - {e.reason}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

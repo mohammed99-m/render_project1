@@ -31,17 +31,17 @@ def send_notification(request, user_id):
     if serializer.is_valid():
         notification = serializer.save()
         external_data = {}
-        # url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
-        # try:
-        #     with urllib.request.urlopen(url) as response:
-        #         external_data = json.load(response)
-        # except Exception as e:
-        #     external_data = {"error": str(e)}
+        url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
+        try:
+            with urllib.request.urlopen(url) as response:
+                external_data = json.load(response)
+        except Exception as e:
+            external_data = {"error": str(e)}
 
         final_data = {
             "notification": notification.content,
             "room_name": notification.room_name,
-            ##"external_result": external_data
+            "external_result": external_data
         }
         channel_layer = get_channel_layer()
 

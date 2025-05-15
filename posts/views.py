@@ -59,14 +59,19 @@ from rest_framework.response import Response
 from rest_framework import status
 
 @api_view(['POST'])
-def like_on_post(request, post_id, user_id):
+def like_on_post(request, post_id, user_id,author_id):
+    user_url=""
     like_post_url = f"https://mohammedmoh.pythonanywhere.com/posts/like/{post_id}/{user_id}/"
     send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications/{user_id}/"
-    try:
         # Send POST request to like the post
-        req = urllib.request.Request(like_post_url, method='POST')
-        with urllib.request.urlopen(req) as response:
-            if response.status == 201:
+    headers = {'Content-Type': 'application/json'}
+    req = urllib.request.Request(like_post_url, method='POST',headers=headers)
+    with urllib.request.urlopen(req) as response:
+            print(req.data)
+            print(response.status)
+            print("H"*5)
+            print(like_post_url)
+            if response.status == 200:
                 data = response.read().decode('utf-8')
                 result = json.loads(data)
                 action = result.get('message')
@@ -74,9 +79,16 @@ def like_on_post(request, post_id, user_id):
                     print("You liked the post.")
 
                     # Send GET request to notification URL
+                    notification_data = json.dumps({
+                        'content': f"{request.data['name']} like your post",
+                        'room_name':f'{author_id}',
+                      }).encode('utf-8')
                     try:
-                        with urllib.request.urlopen(send_notification_url) as notify_response:
-                            if notify_response.status == 200:
+                        
+                        req2 = urllib.request.Request(send_notification_url, method='POST',headers=headers,data=notification_data)
+                        with urllib.request.urlopen(req2) as notify_response:
+                            print(notify_response.status)
+                            if notify_response.status == 201:
                                 return Response(
                                     {"message": "You liked the post and notification sent."},
                                     status=status.HTTP_201_CREATED
@@ -102,12 +114,7 @@ def like_on_post(request, post_id, user_id):
             else:
                 return Response({"message": f"Failed to like the post"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    except urllib.error.HTTPError as e:
-        return Response({"error": f"HTTP Error: {e.code} - {e.reason}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    except urllib.error.URLError as e:
-        return Response({"error": f"URL Error: {e.reason}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 

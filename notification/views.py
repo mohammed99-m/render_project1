@@ -30,6 +30,8 @@ def send_notification(request, user_id):
     serializer = NotificationSerializer(data=request.data)
     if serializer.is_valid():
         notification = serializer.save()
+
+        
         external_data = {}
         url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
         try:
@@ -37,7 +39,6 @@ def send_notification(request, user_id):
                 external_data = json.load(response)
         except Exception as e:
             external_data = {"error": str(e)}
-        
 
         final_data = {
             "notification": notification.content,

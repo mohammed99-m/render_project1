@@ -117,24 +117,76 @@ def like_on_post(request, post_id, user_id,author_id):
 
 
 
+@api_view(['POST'])
+def add_comment(request, post_id, user_id,author_id):
+    user_url=""
+    comment_on_post_url = f"https://mohammedmoh.pythonanywhere.com/posts/addcomment/{post_id}/{user_id}/"
+    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications/{user_id}/"
+        # Send POST request to like the post
+    headers = {'Content-Type': 'application/json'}
+    comment_data = json.dumps({"text": request.data['text']}).encode('utf-8')
+    req = urllib.request.Request(comment_on_post_url, method='POST',headers=headers,data=comment_data)
+    with urllib.request.urlopen(req) as response:
+            print(req.data)
+            print(response.status)
+            print("H"*5)
+            print(send_notification_url)
+            if response.status == 201:
+                data = response.read().decode('utf-8')
+                result = json.loads(data)
+                action = result.get('message')
+                if action == 'comment add succesfuly':
+                    print("you add comment on this post")
+
+                    # Send GET request to notification URL
+                    notification_data = json.dumps({
+                        'content': f"{request.data['name']} like your post",
+                        'room_name':f'{author_id}',
+                      }).encode('utf-8')
+                    try:
+                        
+                        req2 = urllib.request.Request(send_notification_url, method='POST',headers=headers,data=notification_data)
+                        with urllib.request.urlopen(req2) as notify_response:
+                            print(notify_response.status)
+                            if notify_response.status == 201:
+                                return Response(
+                                    {"message": "You add the comment succesfuly on the post and notification sent."},
+                                    status=status.HTTP_201_CREATED
+                                )
+                            else:
+                                return Response(
+                                    {"message": "you add comment on the post , but failed to send notification."},
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                                )
+                    except urllib.error.HTTPError as e:
+                        return Response(
+                            {"message": "You add commint on the post, but failed to send notification.", "error": str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                        )
+
+                else:
+                    return Response({"message": "Unknown action received."}, status=status.HTTP_200_OK)
+
+            else:
+                return Response({"message": f"Failed to add commint on the post"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(['post'])
-def add_comment(request,post_id,user_id):
-    try:
+# @api_view(['post'])
+# def add_comment(request,post_id,user_id):
+#     try:
         
-        profile = Profile.objects.get(user__id=user_id)
-    except Profile.DoesNotExist:
-        return Response({'error': 'Profile not found.'}, status=status.HTTP_404_NOT_FOUND)
-    try:
+#         profile = Profile.objects.get(user__id=user_id)
+#     except Profile.DoesNotExist:
+#         return Response({'error': 'Profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+#     try:
        
-        post = Post.objects.get(id=post_id)
-    except Profile.DoesNotExist:
-        return Response({'error': 'Post not found.'}, status=status.HTTP_404_NOT_FOUND)
+#         post = Post.objects.get(id=post_id)
+#     except Profile.DoesNotExist:
+#         return Response({'error': 'Post not found.'}, status=status.HTTP_404_NOT_FOUND)
     
-    comment = Comment(writer=profile,post=post,text=request.data['text'])
-    comment.save()
-    return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
+#     comment = Comment(writer=profile,post=post,text=request.data['text'])
+#     comment.save()
+#     return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET'])

@@ -1,5 +1,7 @@
+import json
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+import urllib
 from .serializers import RegisterSerializer,LoginSerializer
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -275,63 +277,112 @@ def get_trainers(request, coach_id):
 
 from .models import JoinRequest
 @api_view(['POST'])
-def send_join_request(request, user_id, coach_id):
-    try:
-        ##المرسل id البروفايل الخاص بالمتدرب من ال 
-        trainer_profile = Profile.objects.get(user__id=user_id)
-        ##المرسل id البروفايل الخاص بالمدرب من ال 
-        coach_profile = Profile.objects.get(user__id=coach_id)
+def send_join_request(request,trainer_id,coach_id):
+    send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/sendjoinrequest/{trainer_id}/{coach_id}/"
+    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications/{trainer_id}/"
+        # Send POST request to like the post
+    headers = {'Content-Type': 'application/json'}
+    req = urllib.request.Request(send_join_request_url, method='POST',headers=headers)
+    with urllib.request.urlopen(req) as response:
+            print(response.status)
+            print("H"*50)
+            print(send_notification_url)
+            if response.status == 201:
+                data = response.read().decode('utf-8')
+                result = json.loads(data)
+                action = result.get('message')
+                if action == 'Join request sent successfully':
+                    print("you send the request succesfuly")
 
-        # اذا الطلب الردي مبعوت
-        if JoinRequest.objects.filter(trainer=trainer_profile, coach=coach_profile, status='Pending').exists():
-            return Response({"message": "a pending request already exist"}, status=400)
-        
-        if trainer_profile.id in [trainer.id for trainer in coach_profile.trainers.all()]:
-              return Response({"message": "You are already joined with that coach"}, status=400)
+                    # Send GET request to notification URL
+                    notification_data = json.dumps({
+                        'content': f"{request.data['name']} send you a join request",
+                        'room_name':f'{coach_id}',
+                      }).encode('utf-8')
+                    try:
+                        
+                        req2 = urllib.request.Request(send_notification_url, method='POST',headers=headers,data=notification_data)
+                        with urllib.request.urlopen(req2) as notify_response:
+                            print(notify_response.status)
+                            if notify_response.status == 201:
+                                return Response(
+                                    {"message": "You send the request succesfuly and notification sent."},
+                                    status=status.HTTP_201_CREATED
+                                )
+                            else:
+                                return Response(
+                                    {"message": "You send the request succesfuly, but failed to send notification."},
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                                )
+                    except urllib.error.HTTPError as e:
+                        return Response(
+                            {"message": "You send the request succesfuly, but failed to send notification.", "error": str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                        )
 
-        #  والا ننشئ خانة جديدة في جدول الطلبات
-        JoinRequest.objects.create(trainer=trainer_profile, coach=coach_profile)
-        return Response({"message": "Join request sent successfully"}, status=201)
-    # في حال مافي متدرب او مدرب موافق للايدي المبعوت
-    except Profile.DoesNotExist:
-        return Response({"message": "User or Coach Profile not found!"}, status=404)
+                else:
+                    return Response({"message": f"{action}"}, status=status.HTTP_200_OK)
+
+            else:
+                return Response({"message": f"Failed to You send the request"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
  
+from .models import JoinRequest
 @api_view(['POST'])
-## الرد على الطلب بموافقة او رفض
-def respond_to_join_request(request, coach_id, request_id):
-    try:
-        ## جلب المدرب و طلب الارسال من الجداول
-        coach_profile = Profile.objects.get(user__id=coach_id)
-        join_request = JoinRequest.objects.get(id=request_id, coach=coach_profile)
+def response_to_join_request(request,request_id,coach_id,trainer_id):
+    send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/responsetojoinrequest/{coach_id}/{request_id}/"
+    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications/{coach_id}/"
+        # Send POST request to like the post
+    headers = {'Content-Type': 'application/json'}
+    join_request_data = json.dumps({"action": request.data['action']}).encode('utf-8')
+    req = urllib.request.Request(send_join_request_url, method='POST',headers=headers,data=join_request_data)
+    with urllib.request.urlopen(req) as response:
+            print(response.status)
+            print("H"*50)
+            print(send_notification_url)
+            if response.status == 201:
+                data = response.read().decode('utf-8')
+                result = json.loads(data)
+                action = result.get('message')
+                if action == 'Join request accepted' or action =='Join request rejected':
+                    message =""
+                    if action == 'Join request accepted':
+                        message = "Accept"
+                    else:
+                        message = "Reject"
+                    # Send GET request to notification URL
+                    notification_data = json.dumps({
+                        'content': f"coach {request.data['name']} {message} your join request",
+                        'room_name':f'{trainer_id}',
+                      }).encode('utf-8')
+                    try:
+                        
+                        req2 = urllib.request.Request(send_notification_url, method='POST',headers=headers,data=notification_data)
+                        with urllib.request.urlopen(req2) as notify_response:
+                            print(notify_response.status)
+                            if notify_response.status == 201:
+                                return Response(
+                                    {"message": f"{action} and notification sent."},
+                                    status=status.HTTP_201_CREATED
+                                )
+                            else:
+                                return Response(
+                                    {"message": f"{action}, but failed to send notification."},
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                                )
+                    except urllib.error.HTTPError as e:
+                        return Response(
+                            {"message": f"{action}, but failed to send notification.", "error": str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                        )
 
-        # request انشاء متحول بقيمة الرد القادم من ال 
-        action = request.data.get('action')
-        ## هون اذا كنا باعتين شي غلط غير الرفض و القبول
-        if action not in ['Accept', 'Reject']:
-            return Response({"message": "Invalid action. Use 'Accept' or 'Reject'."}, status=400)
-        
-        # حالة القبول 
-        if action == 'Accept':
-            #منضيف المستخدم الموجود ضمن طلب الانضمام لمصفوفة المتدربين الخاصين بهذا المدرب
-            coach_profile.trainers.add(join_request.trainer)
-            #هون صارت حالة الطلب هي مقبول
-            join_request.status = 'Accepted'
-            join_request.save()
-            return Response({"message": "Join request accepted"}, status=200)
-        # حالة الرفض 
-        elif action == 'Reject':
-            join_request.status = 'Rejected'
-            join_request.save()
-            return Response({"message": "Join request rejected"}, status=200)
-    ## حالات الفشل
-    except Profile.DoesNotExist:
-        return Response({"message": "Coach Profile not found"}, status=404)
-    except JoinRequest.DoesNotExist:
-        return Response({"message": "Join request not found"}, status=404)
+                else:
+                    return Response({"message": f"{action}"}, status=status.HTTP_200_OK)
 
-
+            else:
+                return Response({"message": f"Failed to You send the request"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
 @api_view(['GET'])
 # جلب جميع طلبات الانضمام الخاصة بمدرب معين
 def get_join_requests(request, coach_id):

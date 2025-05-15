@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real-time Notification Test</title>
+</head>
+<body>
+    <h1>🔔 Real-time Notification Test</h1>
+
+    <div id="notifications" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
+        <strong>Notifications:</strong>
+    </div>
+
+    <button onclick="likePost()">👍 Like Post</button>
+
+    <script>
+        const userid = 5;  // يجب أن يطابق نفس room_name في السيرفر
+        const socket = new WebSocket("wss://render-project1-qyk2.onrender.com/ws/notification/5/");
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const div = document.getElementById("notifications");
+            div.innerHTML += `<p>${data.notification.notification}</p>`;
+        };
+
+        socket.onopen = function(e) {
+            console.log("✅ WebSocket connected.");
+        };
+        socket.onerror = function(error) {
+            console.error("❌ WebSocket error:", error);
+        };
+
+        function likePost() {
+            fetch("http://localhost:8000/posts/like/1/4/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json().then(data => ({status: response.status, body: data})))
+            .then(result => {
+                const { status, body } = result;
+
+                if (status === 201) {
+                    alert("✅ تم الإعجاب بنجاح وتم إرسال الإشعار!");
+                } else if (status === 500) {
+                    alert("⚠️ تم الإعجاب ولكن فشل إرسال الإشعار.");
+                } else {
+                    alert("❌ حدث خطأ: " + JSON.stringify(body));
+                }
+
+                console.log("📨 Response:", body);
+            })
+            .catch(error => {
+                console.error("❌ Error sending like:", error);
+                alert("❌ فشل إرسال الطلب إلى السيرفر." + error.message);
+            });
+        }
+    </script>
+</body>
+</html>

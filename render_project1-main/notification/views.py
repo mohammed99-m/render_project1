@@ -33,7 +33,7 @@ def send_notification(request, user_id):
 
         
         external_data = {}
-        url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
+        url = f" http://127.0.0.1:8000/user/{user_id}/"
         try:
             with urllib.request.urlopen(url) as response:
                 external_data = json.load(response)

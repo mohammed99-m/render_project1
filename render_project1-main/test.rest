@@ -222,7 +222,18 @@ Content-Type: application/json
 }
 
 ###
+POST http://render-project1-qyk2.onrender.com/notification/send-notifications/5/
+Content-Type: application/json
+## Token instated of Bearer for normal token
+##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
 
+{
+  "content": "🔔 اختبار إشعار",
+  "user_id": 5,
+  "room_name": "user_5"
+}
+
+########
 POST http://127.0.0.1:8000/posts/like/1/4/
 Content-Type: application/json
 ## Token instated of Bearer for normal token

@@ -48,9 +48,15 @@ INSTALLED_APPS = [
     'health',
     'chatapp',
     'channels',
-    'notification'
+    'notification',
+    'corsheaders'
 
 ]
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    ...
+]
+CORS_ALLOW_ALL_ORIGINS = True
 
 ASGI_APPLICATION = "project.asgi.application"
 
@@ -58,6 +64,9 @@ ASGI_APPLICATION = "project.asgi.application"
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
     },
 }
 

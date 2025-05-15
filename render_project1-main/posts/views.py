@@ -76,7 +76,7 @@ def like_on_post(request, post_id, user_id):
         notification_data = {
             'content': notification_message,
             'user_id': author_id,
-            'room_name': f'post_{post_id}'
+            'room_name': f'user_{author_id}'
         }
 
         response = requests.post(notification_url, json=notification_data)

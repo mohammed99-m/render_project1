@@ -1,5 +1,6 @@
 import json
 import urllib.request
+import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -44,6 +45,28 @@ def SendMessageView(request,user_id):
                 "message": final_data,
             }
         )
+
+#يجب اضافة المستقبل ضمن جسم تابع ارسال الرسالة 
+        receiver_id = request.data.get("receiver_id")
+
+
+        if receiver_id:
+            notification_message = f"You have a new message"
+            notification_url = f"http://127.0.0.1:8000/notification/send-notifications/{receiver_id}/"
+
+
+            notification_data={
+                "content": notification_message,
+                "user_id": receiver_id,
+                "room_name": f"user_{receiver_id}"
+            }
+
+            try:
+                response = requests.post(notification_url, json=notification_data)
+                print("Notification sent:", response.status_code, response.text)
+            except Exception as e:
+                print("Failed to send notification:", str(e))
+                 
 
         # Step 4: Return the same data to the API client
         return Response(final_data, status=status.HTTP_201_CREATED)

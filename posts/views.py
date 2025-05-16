@@ -11,28 +11,61 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from notification.consumers import Notification
 
-@api_view(['POST'])
-def add_post(request,author_id):
-    content = request.data.get('content')  
+# @api_view(['POST'])
+# def add_post(request,author_id):
+#     content = request.data.get('content')  
+#     add_post_url = f"https://mohammedmoh.pythonanywhere.com/posts/like/{post_id}/"
+#         # Send POST request to like the post
+#     headers = {'Content-Type': 'application/json'}
+#     req = urllib.request.Request(like_post_url, method='POST',headers=headers)
+#     with urllib.request.urlopen(req) as response:
+#             print(req.data)
+#             print(response.status)
+#             print("H"*5)
+#             print(like_post_url)
+#             if response.status == 200:
+#                 data = response.read().decode('utf-8')
+#                 result = json.loads(data)
+#                 action = result.get('message')
+#                 if action == 'like':
+#                     print("You liked the post.")
 
-    try:
-       
-        profile = get_object_or_404(Profile,user_id=author_id)
-    except Profile.DoesNotExist:
-        return Response({'error': 'Profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+#                     # Send GET request to notification URL
+#                     notification_data = json.dumps({
+#                         'content': f"{request.data['name']} like your post",
+#                         'room_name':f'{author_id}',
+#                       }).encode('utf-8')
+#                     try:
+                        
+#                         req2 = urllib.request.Request(send_notification_url, method='POST',headers=headers,data=notification_data)
+#                         with urllib.request.urlopen(req2) as notify_response:
+#                             print(notify_response.status)
+#                             if notify_response.status == 201:
+#                                 return Response(
+#                                     {"message": "You liked the post and notification sent."},
+#                                     status=status.HTTP_201_CREATED
+#                                 )
+#                             else:
+#                                 return Response(
+#                                     {"message": "You liked the post, but failed to send notification."},
+#                                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#                                 )
+#                     except urllib.error.HTTPError as e:
+#                         return Response(
+#                             {"message": "You liked the post, but failed to send notification.", "error": str(e)},
+#                             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#                         )
 
-  
-    serializer = ProfileSerializer(profile)
-    post_data = {
-        'content': content,
-        'author': serializer.data,  
-    }
-    print(post_data)
-    post = Post(author=profile,content= content)
-    serializer = PostSerializer(post)
-    print(post.author.user.id)
-    post.save()  
-    return Response(PostSerializer(post).data, status=status.HTTP_201_CREATED)
+#                 elif action == 'dislike':
+#                     print("You disliked the post.")
+#                     return Response({"message": "You disliked the post."}, status=status.HTTP_200_OK)
+
+#                 else:
+#                     return Response({"message": "Unknown action received."}, status=status.HTTP_200_OK)
+
+#             else:
+#                 return Response({"message": f"Failed to like the post"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
 
 
 @api_view(['GET'])

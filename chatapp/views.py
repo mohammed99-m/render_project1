@@ -8,19 +8,60 @@ from .serializers import MessageSerializer
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
+# @api_view(["POST"])
+# def SendMessageView(request,user_id):
+#     print("K" * 50)
+#     print(user_id)
+#     key = str(user_id)
+#     print(key)
+#     serializer = MessageSerializer(data=request.data)
+#     if serializer.is_valid():
+#         message = serializer.save()
+
+#         # Step 1: Call external server using urllib
+#         external_data = {}
+#         url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
+#         try:
+#             print("H" * 50)
+#             with urllib.request.urlopen(url) as response:
+#                 external_data = json.load(response)
+#         except Exception as e:
+#             external_data = {"error": str(e)}
+
+#         # Step 2: Create final response data
+#         final_data = {
+#             "message": message.content,
+#             "room_name": message.room_name,
+#             "external_result": external_data
+#         }
+
+#         # Step 3: Broadcast to WebSocket
+#         channel_layer = get_channel_layer()
+#         async_to_sync(channel_layer.group_send)(
+#             f"chat_{message.room_name}",
+#             {
+#                 "type": "chat_message",
+#                 "message": final_data,
+#             }
+#         )
+
+#         # Step 4: Return the same data to the API client
+#         return Response(final_data, status=status.HTTP_201_CREATED)
+
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 @api_view(["POST"])
-def SendMessageView(request,user_id):
+def SendMessageView(request, sender_id,reciver_id):
     print("K" * 50)
-    print(user_id)
-    key = str(user_id)
+    key = str(reciver_id)
     print(key)
+    
     serializer = MessageSerializer(data=request.data)
     if serializer.is_valid():
         message = serializer.save()
 
         # Step 1: Call external server using urllib
         external_data = {}
-        url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
+        url = f"https://mohammedmoh.pythonanywhere.com/user/{sender_id}/"
         try:
             print("H" * 50)
             with urllib.request.urlopen(url) as response:
@@ -35,13 +76,21 @@ def SendMessageView(request,user_id):
             "external_result": external_data
         }
 
-        # Step 3: Broadcast to WebSocket
+        # Step 3: Broadcast to WebSocket (Chat + Notification)
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             f"chat_{message.room_name}",
             {
                 "type": "chat_message",
                 "message": final_data,
+            }
+        )
+
+        async_to_sync(channel_layer.group_send)(
+            f"notification_{key}",  # assuming NotificationConsumer listens to this
+            {
+                "type": "send_notification",  # your NotificationConsumer must handle this
+                "notification": final_data,
             }
         )
 

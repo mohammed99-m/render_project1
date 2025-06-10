@@ -130,26 +130,25 @@ def send_notification3(request, user_id):
     if serializer.is_valid():
         notification = serializer.save()
 
-        # STEP 1: Fetch player_id from external user API
         external_data = {}
-        player_id = None  # Safe default
+        player_id = None
         url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
 
         try:
             with urllib.request.urlopen(url) as response:
                 external_data = json.load(response)
-                player_id = external_data.get("player_id")  # <- get player_id correctly
+                player_id = external_data.get("player_id")
         except Exception as e:
             external_data = {"error": str(e)}
 
-        # STEP 2: WebSocket Notification
         final_data = {
             "notification": notification.content,
             "room_name": notification.room_name,
-            "player_id": player_id,  # include for frontend if needed
+            "player_id": player_id,
             "external_data": external_data
         }
-
+        
+        print(notification.room_name)
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             f'notification_{notification.room_name}',
@@ -159,18 +158,23 @@ def send_notification3(request, user_id):
             }
         )
 
-        # STEP 3: Push Notification via OneSignal
+        # SEND PUSH
         if player_id:
             try:
                 onesignal_client = OneSignalClient(
                     app_id=ONESIGNAL_APP_ID,
                     rest_api_key=ONESIGNAL_API_KEY
                 )
-                onesignal_client.send_notification(
-                    contents={"en": notification.content},
-                    include_player_ids=[player_id],
-                    headings={"en": "New Notification"},
+
+                response = onesignal_client.send_notification(
+                    notification_body={
+                        "include_player_ids": [player_id],
+                        "headings": {"en": "New Notification"},
+                        "contents": {"en": notification.content}
+                    }
                 )
+                final_data["onesignal_response"] = response.body
+               
             except Exception as e:
                 final_data["onesignal_error"] = str(e)
         else:

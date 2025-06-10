@@ -279,7 +279,7 @@ from .models import JoinRequest
 @api_view(['POST'])
 def send_join_request(request,trainer_id,coach_id):
     send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/sendjoinrequest/{trainer_id}/{coach_id}/"
-    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications-push/{trainer_id}/"
+    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications-push-updated/{trainer_id}/"
         # Send POST request to like the post
     headers = {'Content-Type': 'application/json'}
     req = urllib.request.Request(send_join_request_url, method='POST',headers=headers)

@@ -107,6 +107,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'project.wsgi.application'
+## onesignal settings
 ONESIGNAL_APP_ID = "be23165a-a4b3-49ce-a6bd-3e094d815cef"
 ONESIGNAL_API_KEY = "os_v2_app_xyrrmwvewne45jv5hyeu3ak455vqvqrqrvhuyjmsmxisgssmvglxgfmpn7hhb3z4xpzlqu4ozkqdctrcgxcfax3k67qtg7mnp726mfq"
 

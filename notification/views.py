@@ -122,3 +122,60 @@ def send_notification2(request, user_id):
         return Response(final_data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+def send_notification3(request, user_id):
+    serializer = NotificationSerializer(data=request.data)
+    if serializer.is_valid():
+        notification = serializer.save()
+
+        # STEP 1: Fetch player_id from external user API
+        external_data = {}
+        player_id = None  # Safe default
+        url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
+
+        try:
+            with urllib.request.urlopen(url) as response:
+                external_data = json.load(response)
+                player_id = external_data.get("player_id")  # <- get player_id correctly
+        except Exception as e:
+            external_data = {"error": str(e)}
+
+        # STEP 2: WebSocket Notification
+        final_data = {
+            "notification": notification.content,
+            "room_name": notification.room_name,
+            "player_id": player_id,  # include for frontend if needed
+            "external_data": external_data
+        }
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'notification_{notification.room_name}',
+            {
+                'type': 'send_notification',
+                'notification': final_data,
+            }
+        )
+
+        # STEP 3: Push Notification via OneSignal
+        if player_id:
+            try:
+                onesignal_client = OneSignalClient(
+                    app_id=ONESIGNAL_APP_ID,
+                    rest_api_key=ONESIGNAL_API_KEY
+                )
+                onesignal_client.send_notification(
+                    contents={"en": notification.content},
+                    include_player_ids=[player_id],
+                    headings={"en": "New Notification"},
+                )
+            except Exception as e:
+                final_data["onesignal_error"] = str(e)
+        else:
+            final_data["onesignal_error"] = "No player_id available"
+
+        return Response(final_data, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

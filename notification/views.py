@@ -145,7 +145,6 @@ def send_notification3(request, user_id):
             "notification": notification.content,
             "room_name": notification.room_name,
             "player_id": player_id,
-            "external_data": external_data
         }
         
         print(notification.room_name)

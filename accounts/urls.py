@@ -17,6 +17,5 @@ urlpatterns = [
     path('getexperincelevel/',views.return_experince_level,name="Experince Level"),
     path('getrequeststatus/<str:trainer_id>/',views.get_request_status,name="Request Status"),
     path('gettrainerinfo/<str:trainer_id>/<str:coach_id>/',views.get_trainer_info,name="Get Trainer Info"),
-    path('test-onesignal/',views.test_onesignal_notification,name="test_onesignal_notification")
 
 ]

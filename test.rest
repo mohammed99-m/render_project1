@@ -16,7 +16,7 @@ Accept: application/json
 POST http://127.0.0.1:8000/register/
 Content-Type: application/json
 
-{"username":"manar22" , "email":"manar22@gmail.com" , "password":"1234","phone":"1234", "weight":70.9,"height":180.6,"first_name":"K","last_name":"ah",
+{"username":"ma2" , "email":"ma2@gmail.com" , "password":"1234","phone":"1234", "weight":70.9,"height":180.6,"first_name":"K","last_name":"ah",
 "gender":"male",
 "goal":"lose_weight",
 "experianse_level" :"advanced",
@@ -91,7 +91,7 @@ Content-Type: application/json
 
 ###
 
-POST http://127.0.0.1:9000/sendjoinrequest/6/1/
+POST http://127.0.0.1:8000/sendjoinrequest/10/1/
 Content-Type: application/json
 ## Token instated of Bearer for normal token
 ##Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2NTE3NzU5LCJpYXQiOjE3MzQ5ODE3NTksImp0aSI6IjZiMTM2OTNmMTUxMzRmMjRiNDk2ZjJjMWNjNWVkMTkzIiwidXNlcl9pZCI6ODF9.wuFvOWdUQ_WwuICdFAYoMd3GGqmZWcf0jELpCbPAzeU
@@ -99,20 +99,7 @@ Content-Type: application/json
 {
   "name":"manar1"
 }
-######
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "da52223b-d34b-4e8e-9e7c-6d6df5d3ffb4",
-      safari_web_id: "web.onesignal.auto.271ef36b-44de-4fef-87dc-9a2f81b1418e",
-      notifyButton: {
-        enable: true,
-      },
-    });
-  });
-</script>
+########
 ##########
 POST http://127.0.0.1:8000/test-onesignal/
 Content-Type: application/json

@@ -189,7 +189,7 @@ def send_notification3(request, user_id):
 ##################
 
 @api_view(["POST"])
-def send_notification4(request, user_id):
+def send_notification4(request, receiver_id, sender_id):
     serializer = NotificationSerializer(data=request.data)
     if serializer.is_valid():
         notification = serializer.save()
@@ -197,7 +197,7 @@ def send_notification4(request, user_id):
         # Get player_id from external API
         external_data = {}
         player_id = None
-        url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
+        url = f"https://mohammedmoh.pythonanywhere.com/user/{receiver_id}/"
 
         try:
             with urllib.request.urlopen(url) as response:
@@ -242,10 +242,13 @@ def send_notification4(request, user_id):
         else:
             final_data["onesignal_error"] = "No player_id available"
 
+#يستدعي تابع حفظ الاشعارات من السيرفر الاساسي ويحفظه
+        #sender=f"https://mohammedmoh.pythonanywhere.com/user/{sender_id}/"
         notification_url = "https://mohammedmoh.pythonanywhere.com/notifications/save-notification/"
         headers = {'Content-Type': 'application/json'}
         post_data = json.dumps({
-            "user": user_id,
+            "receiver": receiver_id,
+            "sender": sender_id,
             "content": notification.content,
             "room_name": notification.room_name
         }).encode('utf-8')
@@ -263,7 +266,8 @@ def send_notification4(request, user_id):
                 else:
                     final_data["db_save_status"] = f"Failed with status {save_response.status}"
         except Exception as e:
-            final_data["db_save_status"] = f"Error saving notification: {e}"
+             error_content = e.read().decode()
+             final_data["db_save_status"] = f"Error saving notification: {e} - {error_content}"
 
         return Response(final_data, status=status.HTTP_201_CREATED)
 

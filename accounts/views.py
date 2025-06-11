@@ -279,7 +279,7 @@ from .models import JoinRequest
 @api_view(['POST'])
 def send_join_request(request,trainer_id,coach_id):
     send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/sendjoinrequest/{trainer_id}/{coach_id}/"
-    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{coach_id}/"
+    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{coach_id}/{trainer_id}"
 
     headers = {'Content-Type': 'application/json'}
     req = urllib.request.Request(send_join_request_url, method='POST',headers=headers)
@@ -302,28 +302,16 @@ def send_join_request(request,trainer_id,coach_id):
                         
                         req2 = urllib.request.Request(send_notification_url, method='POST',headers=headers,data=notification_data)
                         with urllib.request.urlopen(req2) as notification_response:
-                            print(notification_response.status)
-                            if notification_response.status == 201:
-                                notification_url = f"https://mohammedmoh.pythonanywhere.com/notifications/save-notification/"
-                                save_data = json.dumps({
-                                    "user": coach_id,
-                                    "content": f"{request.data['name']} sent you a join request",
-                                    "room_name": f"{coach_id}"
-                                }).encode('utf-8')
+                            notification_response_data = notification_response.read().decode('utf-8')
 
-                                save_req = urllib.request.Request(notification_url, data=save_data, method='POST', headers=headers)
-                                with urllib.request.urlopen(save_req) as save_response:
-                                    print("Saved notification to main server, status:", save_response.status)
+                            print("Notification service responded with:", notification_response_data)
 
-                                return Response(
+                          
+                            return Response(
                                     {"message": "You send the request succesfuly and notification sent."},
                                     status=status.HTTP_201_CREATED
-                                )
-                            else:
-                                return Response(
-                                    {"message": "You send the request succesfuly, but failed to send notification."},
-                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                                )
+                            )
+                            
                     except urllib.error.HTTPError as e:
                         return Response(
                             {"message": "You send the request succesfuly, but failed to send notification.", "error": str(e)},
@@ -392,7 +380,7 @@ from .models import JoinRequest
 @api_view(['POST'])
 def response_to_join_request(request,request_id,coach_id,trainer_id):
     send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/responsetojoinrequest/{coach_id}/{request_id}/"
-    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications-push-updated/{trainer_id}/"
+    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{trainer_id}/{coach_id}"
         # Send POST request to like the post
     headers = {'Content-Type': 'application/json'}
     join_request_data = json.dumps({"action": request.data['action']}).encode('utf-8')

@@ -279,8 +279,8 @@ from .models import JoinRequest
 @api_view(['POST'])
 def send_join_request(request,trainer_id,coach_id):
     send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/sendjoinrequest/{trainer_id}/{coach_id}/"
-    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications-push-updated/{coach_id}/"
-        # Send POST request to like the post
+    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{coach_id}/"
+
     headers = {'Content-Type': 'application/json'}
     req = urllib.request.Request(send_join_request_url, method='POST',headers=headers)
     with urllib.request.urlopen(req) as response:
@@ -294,7 +294,6 @@ def send_join_request(request,trainer_id,coach_id):
                 if action == 'Join request sent successfully':
                     print("you send the request succesfuly")
 
-                    # Send GET request to notification URL
                     notification_data = json.dumps({
                         'content': f"{request.data['name']} send you a join request",
                         'room_name':f'{coach_id}',
@@ -302,9 +301,20 @@ def send_join_request(request,trainer_id,coach_id):
                     try:
                         
                         req2 = urllib.request.Request(send_notification_url, method='POST',headers=headers,data=notification_data)
-                        with urllib.request.urlopen(req2) as notify_response:
-                            print(notify_response.status)
-                            if notify_response.status == 201:
+                        with urllib.request.urlopen(req2) as notification_response:
+                            print(notification_response.status)
+                            if notification_response.status == 201:
+                                notification_url = f"https://mohammedmoh.pythonanywhere.com/notifications/save-notification/"
+                                save_data = json.dumps({
+                                    "user": coach_id,
+                                    "content": f"{request.data['name']} sent you a join request",
+                                    "room_name": f"{coach_id}"
+                                }).encode('utf-8')
+
+                                save_req = urllib.request.Request(notification_url, data=save_data, method='POST', headers=headers)
+                                with urllib.request.urlopen(save_req) as save_response:
+                                    print("Saved notification to main server, status:", save_response.status)
+
                                 return Response(
                                     {"message": "You send the request succesfuly and notification sent."},
                                     status=status.HTTP_201_CREATED
@@ -326,7 +336,57 @@ def send_join_request(request,trainer_id,coach_id):
             else:
                 return Response({"message": f"Failed to You send the request"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+#######
+# @api_view(['POST'])
+# def send_join_request(request,trainer_id,coach_id):
+#     send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/sendjoinrequest/{trainer_id}/{coach_id}/"
+#     send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications-push-updated/{coach_id}/"
+#         # Send POST request to like the post
+#     headers = {'Content-Type': 'application/json'}
+#     req = urllib.request.Request(send_join_request_url, method='POST',headers=headers)
+#     with urllib.request.urlopen(req) as response:
+#             print(response.status)
+#             print("H"*50)
+#             print(send_notification_url)
+#             if response.status == 201:
+#                 data = response.read().decode('utf-8')
+#                 result = json.loads(data)
+#                 action = result.get('message')
+#                 if action == 'Join request sent successfully':
+#                     print("you send the request succesfuly")
 
+#                     # Send GET request to notification URL
+#                     notification_data = json.dumps({
+#                         'content': f"{request.data['name']} send you a join request",
+#                         'room_name':f'{coach_id}',
+#                       }).encode('utf-8')
+#                     try:
+                        
+#                         req2 = urllib.request.Request(send_notification_url, method='POST',headers=headers,data=notification_data)
+#                         with urllib.request.urlopen(req2) as notify_response:
+#                             print(notify_response.status)
+#                             if notify_response.status == 201:
+#                                 return Response(
+#                                     {"message": "You send the request succesfuly and notification sent."},
+#                                     status=status.HTTP_201_CREATED
+#                                 )
+#                             else:
+#                                 return Response(
+#                                     {"message": "You send the request succesfuly, but failed to send notification."},
+#                                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#                                 )
+#                     except urllib.error.HTTPError as e:
+#                         return Response(
+#                             {"message": "You send the request succesfuly, but failed to send notification.", "error": str(e)},
+#                             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#                         )
+
+#                 else:
+#                     return Response({"message": f"{action}"}, status=status.HTTP_200_OK)
+
+#             else:
+#                 return Response({"message": f"Failed to You send the request"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
  
 from .models import JoinRequest
 @api_view(['POST'])
@@ -482,3 +542,4 @@ def get_trainer_info(request,trainer_id,coach_id):
     #الممرر id اذا كان مافي بروفايل لهاد ال 
     except Profile.DoesNotExist:
         return Response({"error": "Profile not found"}, status=404)
+    

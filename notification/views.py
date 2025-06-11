@@ -182,3 +182,87 @@ def send_notification3(request, user_id):
         return Response(final_data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+##################
+
+@api_view(["POST"])
+def send_notification4(request, user_id):
+    serializer = NotificationSerializer(data=request.data)
+    if serializer.is_valid():
+        notification = serializer.save()
+
+        # Get player_id from external API
+        external_data = {}
+        player_id = None
+        url = f"https://mohammedmoh.pythonanywhere.com/user/{user_id}/"
+
+        try:
+            with urllib.request.urlopen(url) as response:
+                external_data = json.load(response)
+                player_id = external_data.get("player_id")
+        except Exception as e:
+            external_data = {"error": str(e)}
+
+        # Send WebSocket Notification
+        final_data = {
+            "notification": notification.content,
+            "room_name": notification.room_name,
+            "player_id": player_id,
+        }
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'notification_{notification.room_name}',
+            {
+                'type': 'send_notification',
+                'notification': final_data,
+            }
+        )
+
+        # Send Push Notification via OneSignal
+        if player_id:
+            try:
+                onesignal_client = OneSignalClient(
+                    app_id=ONESIGNAL_APP_ID,
+                    rest_api_key=ONESIGNAL_API_KEY
+                )
+                response = onesignal_client.send_notification(
+                    notification_body={
+                        "include_player_ids": [player_id],
+                        "headings": {"en": "New Notification"},
+                        "contents": {"en": notification.content}
+                    }
+                )
+                final_data["onesignal_response"] = response.body
+            except Exception as e:
+                final_data["onesignal_error"] = str(e)
+        else:
+            final_data["onesignal_error"] = "No player_id available"
+
+        notification_url = "https://mohammedmoh.pythonanywhere.com/notifications/save-notification/"
+        headers = {'Content-Type': 'application/json'}
+        post_data = json.dumps({
+            "user": user_id,
+            "content": notification.content,
+            "room_name": notification.room_name
+        }).encode('utf-8')
+
+        try:
+            save_request = urllib.request.Request(
+                notification_url,
+                method='POST',
+                data=post_data,
+                headers=headers
+            )
+            with urllib.request.urlopen(save_request) as save_response:
+                if save_response.status == 201:
+                    final_data["db_save_status"] = "Notification saved to main server"
+                else:
+                    final_data["db_save_status"] = f"Failed with status {save_response.status}"
+        except Exception as e:
+            final_data["db_save_status"] = f"Error saving notification: {e}"
+
+        return Response(final_data, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

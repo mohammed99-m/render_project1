@@ -95,7 +95,7 @@ from rest_framework import status
 def like_on_post(request, post_id, user_id,author_id):
     user_url=""
     like_post_url = f"https://mohammedmoh.pythonanywhere.com/posts/like/{post_id}/{user_id}/"
-    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications/{user_id}/"
+    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{author_id}/{user_id}"
         # Send POST request to like the post
     headers = {'Content-Type': 'application/json'}
     req = urllib.request.Request(like_post_url, method='POST',headers=headers)
@@ -154,7 +154,7 @@ def like_on_post(request, post_id, user_id,author_id):
 def add_comment(request, post_id, user_id,author_id):
     user_url=""
     comment_on_post_url = f"https://mohammedmoh.pythonanywhere.com/posts/addcomment/{post_id}/{user_id}/"
-    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-notifications/{user_id}/"
+    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{author_id}/{user_id}"
         # Send POST request to like the post
     headers = {'Content-Type': 'application/json'}
     comment_data = json.dumps({"text": request.data['text']}).encode('utf-8')
@@ -173,7 +173,7 @@ def add_comment(request, post_id, user_id,author_id):
 
                     # Send GET request to notification URL
                     notification_data = json.dumps({
-                        'content': f"{request.data['name']} like your post",
+                        'content': f"{request.data['name']} comment on your post",
                         'room_name':f'{author_id}',
                       }).encode('utf-8')
                     try:
@@ -192,8 +192,9 @@ def add_comment(request, post_id, user_id,author_id):
                                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                                 )
                     except urllib.error.HTTPError as e:
+          
                         return Response(
-                            {"message": "You add commint on the post, but failed to send notification.", "error": str(e)},
+                            {"message": "You add commint on the post, but failed to send notification.","error": str(e)},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR
                         )
 

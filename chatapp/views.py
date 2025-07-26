@@ -134,7 +134,8 @@ def SendMessageView2(request,user_id):
         final_data = {
             "message": message.content,
             "room_name": message.room_name,
-            "external_result": external_data
+            "external_result": external_data,
+            "room_id":message.room_id
         }
 
         # Step 3: Broadcast to WebSocket
@@ -159,7 +160,8 @@ def SendMessageView2(request,user_id):
             notification_data=json.dumps({
                 "content": notification_message,
                 "user_id": receiver_id,
-                "room_name": f"user_{receiver_id}"
+                "room_name": f"user_{receiver_id}",
+                "room_id":message.room_id
             }).encode('utf-8')
 
             req2 = urllib.request.Request(notification_url, method='POST',headers=headers,data=notification_data)

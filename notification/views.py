@@ -197,9 +197,6 @@ from onesignal_sdk.client import Client as OneSignalClient
 import json
 import urllib.request
 
-# Replace these with your actual OneSignal credentials
-ONESIGNAL_APP_ID = "YOUR_ONESIGNAL_APP_ID"
-ONESIGNAL_API_KEY = "YOUR_ONESIGNAL_API_KEY"
 
 @api_view(["POST"])
 def send_notification4(request, receiver_id, sender_id):

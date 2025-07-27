@@ -6,7 +6,7 @@ Content-Type: application/json
 {
   "sender_id": 11,
   "receiver_id": 12,
-  "room_name": "chat_1_2",
+  "room_name": "chat_11_12",
   "content": "Hello",
   "room_id": "room_1_2"
 }

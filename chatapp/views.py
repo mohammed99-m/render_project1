@@ -160,6 +160,7 @@ def SendMessageView2(request,user_id):
                     "sender": sender_id,
                     "receiver": receiver_id,
                     "room_name": message.room_name,
+                    "room_id" :  message.room_id,
                     "content": message.content,
                 }).encode('utf-8')
 

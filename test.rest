@@ -1,16 +1,17 @@
 
 #######
-POST http://127.0.0.1:8000/chat/send_message/2/
+POST http://127.0.0.1:9000/chat/send_message/11/
 Content-Type: application/json
 
 {
-  "sender_id": 1,
-  "receiver_id": 2,
+  "sender_id": 11,
+  "receiver_id": 12,
   "room_name": "chat_1_2",
-  "content": "Hello"
+  "content": "Hello",
+  "room_id": "room_1_2"
 }
 #######
-POST http://127.0.0.1:8000/login/
+POST http://127.0.0.1:9000/login/
 Content-Type: application/json
 
 {"username":"Kamel" ,  "password":"1234"}
@@ -25,10 +26,10 @@ Accept: application/json
 
 ###
 
-POST http://127.0.0.1:8000/register/
+POST http://127.0.0.1:9000/register/
 Content-Type: application/json
 
-{"username":"ma2" , "email":"ma2@gmail.com" , "password":"1234","phone":"1234", "weight":70.9,"height":180.6,"first_name":"K","last_name":"ah",
+{"username":"ma" , "email":"ma@gmail.com" , "password":"1234","phone":"1234", "weight":70.9,"height":180.6,"first_name":"K","last_name":"ah",
 "gender":"male",
 "goal":"lose_weight",
 "experianse_level" :"advanced",

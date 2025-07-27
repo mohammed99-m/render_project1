@@ -148,13 +148,41 @@ def SendMessageView2(request,user_id):
             }
         )
 
-#يجب اضافة المستقبل ضمن جسم تابع ارسال الرسالة 
+#يجب اضافة المرسل والمستقبل ضمن جسم تابع ارسال الرسالة 
         receiver_id = request.data.get("receiver_id")
+        sender_id = request.data.get("sender_id")
+        
+        if sender_id and receiver_id:
+            try:
+                #save-message يحفظ الرسالة المرسلة على السيرفر الرئيسي باستخدام التابع
+                save_url = "https://mohammedmoh.pythonanywhere.com/chatapp/save-message/"
+                save_data = json.dumps({
+                    "sender": sender_id,
+                    "receiver": receiver_id,
+                    "room_name": message.room_name,
+                    "content": message.content,
+                }).encode('utf-8')
 
+                save_request = urllib.request.Request(
+                    save_url,
+                    method='POST',
+                    data=save_data,
+                    headers=headers
+                )
 
+                with urllib.request.urlopen(save_request) as save_response:
+                    if save_response.status == 201:
+                        print("Message saved to main server.")
+                    else:
+                        print("Failed to save message:", save_response.status)
+            except Exception as e:
+                print("Error saving message to main server:", str(e))
+        else:
+            print("Missing sender_id or receiver_id, message not saved to main server.")
+#يرسل الاشعار للمستقبل ويحفظها في الداتا بيز الرئيسية
         if receiver_id:
             notification_message = f"You have a new message"
-            notification_url = f"http://127.0.0.1:8000/notification/send-notifications/{receiver_id}/"
+            notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{receiver_id}/{sender_id}"
 
 
             notification_data=json.dumps({

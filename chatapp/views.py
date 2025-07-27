@@ -134,7 +134,8 @@ def SendMessageView2(request,user_id):
         final_data = {
             "message": message.content,
             "room_name": message.room_name,
-            "external_result": external_data
+            "external_result": external_data,
+            "room_id":message.room_id
         }
 
         # Step 3: Broadcast to WebSocket
@@ -149,19 +150,18 @@ def SendMessageView2(request,user_id):
 
 #يجب اضافة المستقبل ضمن جسم تابع ارسال الرسالة 
         receiver_id = request.data.get("receiver_id")
-        sender_id = request.data.get("sender_id")
 
 
         if receiver_id:
             notification_message = f"You have a new message"
-            notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{receiver_id}/{sender_id}"
+            notification_url = f"http://127.0.0.1:8000/notification/send-notifications/{receiver_id}/"
 
 
             notification_data=json.dumps({
-                "receiver": receiver_id,
-                "sender": sender_id,
                 "content": notification_message,
-                "room_name": f"user_{receiver_id}"
+                "user_id": receiver_id,
+                "room_name": f"user_{receiver_id}",
+                "room_id":message.room_id
             }).encode('utf-8')
 
             req2 = urllib.request.Request(notification_url, method='POST',headers=headers,data=notification_data)

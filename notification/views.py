@@ -187,6 +187,19 @@ def send_notification3(request, user_id):
 
 
 ##################
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import NotificationSerializer
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from onesignal_sdk.client import Client as OneSignalClient
+import json
+import urllib.request
+
+# Replace these with your actual OneSignal credentials
+ONESIGNAL_APP_ID = "YOUR_ONESIGNAL_APP_ID"
+ONESIGNAL_API_KEY = "YOUR_ONESIGNAL_API_KEY"
 
 @api_view(["POST"])
 def send_notification4(request, receiver_id, sender_id):
@@ -194,8 +207,7 @@ def send_notification4(request, receiver_id, sender_id):
     if serializer.is_valid():
         notification = serializer.save()
 
-        # Get player_id from external API
-        external_data = {}
+        # Step 1: Get player_id from external API
         player_id = None
         url = f"https://mohammedmoh.pythonanywhere.com/user/{receiver_id}/"
 
@@ -206,7 +218,7 @@ def send_notification4(request, receiver_id, sender_id):
         except Exception as e:
             external_data = {"error": str(e)}
 
-        # Send WebSocket Notification
+        # Step 2: Send WebSocket Notification
         final_data = {
             "notification": notification.content,
             "room_name": notification.room_name,
@@ -222,7 +234,7 @@ def send_notification4(request, receiver_id, sender_id):
             }
         )
 
-        # Send Push Notification via OneSignal
+        # Step 3: Send Push Notification via OneSignal
         if player_id:
             try:
                 onesignal_client = OneSignalClient(
@@ -233,17 +245,19 @@ def send_notification4(request, receiver_id, sender_id):
                     notification_body={
                         "include_player_ids": [player_id],
                         "headings": {"en": "New Notification"},
-                        "contents": {"en": notification.content}
+                        "contents": {"en": notification.content},
+                        "ttl": 86400,       # ⏱️ Hold for 1 day if device is offline
+                        "priority": 10      # ⚡ High-priority delivery
                     }
                 )
+                print(response)
                 final_data["onesignal_response"] = response.body
             except Exception as e:
                 final_data["onesignal_error"] = str(e)
         else:
             final_data["onesignal_error"] = "No player_id available"
 
-#يستدعي تابع حفظ الاشعارات من السيرفر الاساسي ويحفظه
-        #sender=f"https://mohammedmoh.pythonanywhere.com/user/{sender_id}/"
+        # Step 4: Save notification to main server
         notification_url = "https://mohammedmoh.pythonanywhere.com/notifications/save-notification/"
         headers = {'Content-Type': 'application/json'}
         post_data = json.dumps({
@@ -266,8 +280,8 @@ def send_notification4(request, receiver_id, sender_id):
                 else:
                     final_data["db_save_status"] = f"Failed with status {save_response.status}"
         except Exception as e:
-             error_content = e.read().decode()
-             final_data["db_save_status"] = f"Error saving notification: {e} - {error_content}"
+            error_content = e.read().decode()
+            final_data["db_save_status"] = f"Error saving notification: {e} - {error_content}"
 
         return Response(final_data, status=status.HTTP_201_CREATED)
 

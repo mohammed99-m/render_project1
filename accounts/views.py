@@ -349,51 +349,67 @@ def send_join_request22(request, trainer_id, coach_id):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
-from .models import JoinRequest
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+import urllib.request
+import json
+
 @api_view(['POST'])
-def send_join_request(request,trainer_id,coach_id):
+def send_join_request(request, trainer_id, coach_id):
     send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/sendjoinrequest/{trainer_id}/{coach_id}/"
     send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{coach_id}/{trainer_id}"
 
     headers = {'Content-Type': 'application/json'}
-    req = urllib.request.Request(send_join_request_url, method='POST',headers=headers)
-    with urllib.request.urlopen(req) as response:
-            print(response.status)
-            print("H"*50)
-            print(send_notification_url)
+    result_response = {
+        "join_request": None,
+        "notification_status": None,
+        "errors": []
+    }
+
+    # 1. إرسال طلب الانضمام
+    try:
+        join_req = urllib.request.Request(send_join_request_url, method='POST', headers=headers)
+        with urllib.request.urlopen(join_req) as response:
             if response.status == 201:
-                data = response.read().decode('utf-8')
-                result = json.loads(data)
-                action = result.get('message')
-                if action == 'Join request sent successfully':
-                    print("you send the request succesfuly")
-
-                    notification_data = json.dumps({
-                        'content': f"{request.data['name']} send you a join request",
-                        'room_name':f'{coach_id}',
-                      }).encode('utf-8')
-                    try:
-                        req2 = urllib.request.Request(send_notification_url, method='POST',headers=headers,data=notification_data)
-                        with urllib.request.urlopen(req2) as notification_response:
-                            notification_response_data = notification_response.read().decode('utf-8')
-                            print("Notification service responded with:", notification_response_data)
-                            return Response(
-                                    {"message": "You send the request succesfuly and notification sent."},
-                                    status=status.HTTP_201_CREATED
-                            )
-                            
-                    except urllib.error.HTTPError as e:
-                        return Response(
-                            {"message": "You send the request succesfuly, but failed to send notification.", "error": str(e)},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                        )
-
-                else:
-                    return Response({"message": f"{action}"}, status=status.HTTP_200_OK)
-
+                result_response["join_request"] = "Join request sent successfully"
             else:
-                return Response({"message": f"Failed to You send the request"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+                result_response["join_request"] = "Failed to send join request"
+                return Response(result_response, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        result_response["errors"].append(f"Join request error: {str(e)}")
+        return Response(result_response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # 2. تجهيز بيانات الإشعار
+    name = request.data.get('name', 'Someone')
+    content = request.data.get('content', f"{name} sent you a join request")
+    room_name = str(coach_id)
+
+    notification_data = json.dumps({
+        'content': content,
+        'room_name': room_name
+    }).encode('utf-8')
+
+    # 3. إرسال الإشعار
+    try:
+        notif_req = urllib.request.Request(send_notification_url, method='POST', headers=headers, data=notification_data)
+        with urllib.request.urlopen(notif_req) as notif_response:
+            notif_data = notif_response.read().decode('utf-8')
+            result_response["notification_status"] = "Notification sent and saved"
+            result_response["notification_response"] = json.loads(notif_data)
+            return Response(result_response, status=status.HTTP_201_CREATED)
+
+    except urllib.error.HTTPError as e:
+        error_content = e.read().decode()
+        result_response["notification_status"] = "Notification failed"
+        result_response["errors"].append(f"HTTPError: {str(e)} - {error_content}")
+        return Response(result_response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    except Exception as e:
+        result_response["notification_status"] = "Notification failed"
+        result_response["errors"].append(f"Exception: {str(e)}")
+        return Response(result_response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 #######
 # @api_view(['POST'])
 # def send_join_request(request,trainer_id,coach_id):

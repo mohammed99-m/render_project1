@@ -388,7 +388,7 @@ def send_join_request(request, trainer_id, coach_id):
         return Response(result_response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # ✅ تأخير بسيط للسماح بانتشار البيانات
-    time.sleep(1)
+    time.sleep(2)
 
     # 2. تجهيز بيانات الإشعار
     name = request.data.get('name', 'Someone')

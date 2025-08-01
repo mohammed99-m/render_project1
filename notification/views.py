@@ -539,7 +539,7 @@ def send_notification4(request, receiver_id, sender_id):
             final_data["onesignal_error"] = "No player_id available"
 
         # Step 4: Save notification to main server
-        notification_url = "https://mohammedmoh.pythonanywhere.com/notifications/save-notification/"
+        notification_url = "https://mohammedmoh.pythonanywhere.com/notifications/save-notification2/"
         headers = {'Content-Type': 'application/json'}
         post_data = json.dumps({
             "receiver": receiver_id,

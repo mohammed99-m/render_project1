@@ -355,6 +355,13 @@ from rest_framework import status
 import urllib.request
 import json
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+import urllib.request
+import json
+import time
+
 @api_view(['POST'])
 def send_join_request(request, trainer_id, coach_id):
     send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/sendjoinrequest/{trainer_id}/{coach_id}/"
@@ -379,6 +386,9 @@ def send_join_request(request, trainer_id, coach_id):
     except Exception as e:
         result_response["errors"].append(f"Join request error: {str(e)}")
         return Response(result_response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # ✅ تأخير بسيط للسماح بانتشار البيانات
+    time.sleep(1)
 
     # 2. تجهيز بيانات الإشعار
     name = request.data.get('name', 'Someone')
@@ -409,6 +419,7 @@ def send_join_request(request, trainer_id, coach_id):
         result_response["notification_status"] = "Notification failed"
         result_response["errors"].append(f"Exception: {str(e)}")
         return Response(result_response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 #######
 # @api_view(['POST'])

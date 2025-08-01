@@ -564,6 +564,7 @@ def send_notification4(request, receiver_id, sender_id):
             error_content = e.read().decode()
             final_data["db_save_status"] = f"Error saving notification: {e} - {error_content}"
             final_data["ido"]=ido
+            final_data["lll"]=post_data
         return Response(final_data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

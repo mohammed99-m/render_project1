@@ -371,7 +371,8 @@ def send_join_request(request, trainer_id, coach_id):
     result_response = {
         "join_request": None,
         "notification_status": None,
-        "errors": []
+        "errors": [],
+        "Test1":coach_id
     }
 
     # 1. إرسال طلب الانضمام

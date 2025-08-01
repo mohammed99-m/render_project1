@@ -495,6 +495,7 @@ def send_notification4(request, receiver_id, sender_id):
             with urllib.request.urlopen(url) as response:
                 external_data = json.load(response)
                 player_id = external_data.get("player_id")
+                ido=external_data.get("id")
         except Exception as e:
             external_data = {"error": str(e)}
         time.sleep(2)
@@ -562,7 +563,7 @@ def send_notification4(request, receiver_id, sender_id):
         except Exception as e:
             error_content = e.read().decode()
             final_data["db_save_status"] = f"Error saving notification: {e} - {error_content}"
-
+            final_data["ido"]=ido
         return Response(final_data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

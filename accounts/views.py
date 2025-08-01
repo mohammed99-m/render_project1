@@ -273,7 +273,81 @@ def get_trainers(request, coach_id):
     except Profile.DoesNotExist:
         return Response({"message": "Profile not found"}, status=404)
     
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+import json
+import urllib.request
+import urllib.error
 
+@api_view(['POST'])
+def send_join_request22(request, trainer_id, coach_id):
+    send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/sendjoinrequest/{trainer_id}/{coach_id}/"
+    notification_url = "https://mohammedmoh.pythonanywhere.com/notifications/save-notification/"
+    websocket_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{coach_id}/{trainer_id}"
+
+    headers = {'Content-Type': 'application/json'}
+
+    try:
+        # Step 1: Send join request
+        join_request = urllib.request.Request(send_join_request_url, method='POST', headers=headers)
+        with urllib.request.urlopen(join_request) as response:
+            if response.status != 201:
+                return Response({"message": "فشل في إرسال طلب الانضمام"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            join_result = json.loads(response.read().decode())
+            if join_result.get('message') != 'Join request sent successfully':
+                return Response({"message": join_result.get('message')}, status=status.HTTP_200_OK)
+
+        # Step 2: Prepare notification data
+        content = f"{request.data.get('name')} sent you a join request"
+        room_name = str(coach_id)
+        notification_data = {
+            'receiver': coach_id,
+            'sender': trainer_id,
+            'content': content,
+            'room_name': room_name,
+        }
+        encoded_data = json.dumps(notification_data).encode('utf-8')
+
+        # Step 3: Send real-time & push notification
+        notify_request = urllib.request.Request(
+            websocket_notification_url,
+            method='POST',
+            headers=headers,
+            data=encoded_data
+        )
+        with urllib.request.urlopen(notify_request) as notify_response:
+            notify_response_text = notify_response.read().decode('utf-8')
+            print("✅ Notification sent:", notify_response_text)
+
+        # Step 4: Save notification to main server
+        save_request = urllib.request.Request(
+            notification_url,
+            method='POST',
+            headers=headers,
+            data=encoded_data
+        )
+        with urllib.request.urlopen(save_request) as save_response:
+            save_result = save_response.read().decode('utf-8')
+            print("✅ Notification saved:", save_result)
+
+        return Response(
+            {"message": "✅ تم إرسال طلب الانضمام والإشعار بنجاح"},
+            status=status.HTTP_201_CREATED
+        )
+
+    except urllib.error.HTTPError as e:
+        error_detail = e.read().decode()
+        return Response(
+            {"error": str(e), "details": error_detail},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 from .models import JoinRequest
 @api_view(['POST'])
@@ -299,14 +373,10 @@ def send_join_request(request,trainer_id,coach_id):
                         'room_name':f'{coach_id}',
                       }).encode('utf-8')
                     try:
-                        
                         req2 = urllib.request.Request(send_notification_url, method='POST',headers=headers,data=notification_data)
                         with urllib.request.urlopen(req2) as notification_response:
                             notification_response_data = notification_response.read().decode('utf-8')
-
                             print("Notification service responded with:", notification_response_data)
-
-                          
                             return Response(
                                     {"message": "You send the request succesfuly and notification sent."},
                                     status=status.HTTP_201_CREATED

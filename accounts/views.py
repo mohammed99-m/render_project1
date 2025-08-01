@@ -399,7 +399,7 @@ def send_join_request(request, trainer_id, coach_id):
         'content': content,
         'room_name': room_name
     }).encode('utf-8')
-
+    
     # 3. إرسال الإشعار
     try:
         notif_req = urllib.request.Request(send_notification_url, method='POST', headers=headers, data=notification_data)

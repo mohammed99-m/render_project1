@@ -480,7 +480,7 @@ from asgiref.sync import async_to_sync
 from onesignal_sdk.client import Client as OneSignalClient
 import json
 import urllib.request
-
+import time
 @api_view(["POST"])
 def send_notification4(request, receiver_id, sender_id):
     serializer = NotificationSerializer(data=request.data)
@@ -497,7 +497,7 @@ def send_notification4(request, receiver_id, sender_id):
                 player_id = external_data.get("player_id")
         except Exception as e:
             external_data = {"error": str(e)}
-
+        time.sleep(2)
         # Step 2: Send WebSocket Notification
         final_data = {
             "notification": notification.content,

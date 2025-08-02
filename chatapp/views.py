@@ -189,7 +189,7 @@ def SendMessageView2(request,user_id):
             notification_data=json.dumps({
                 "content": notification_message,
                 "user_id": receiver_id,
-                "room_name": f"user_{receiver_id}",
+                "room_name": f"{receiver_id}",
                 "room_id":message.room_id
             }).encode('utf-8')
 

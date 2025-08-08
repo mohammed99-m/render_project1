@@ -18,4 +18,5 @@ urlpatterns = [
     path('getrequeststatus/<str:trainer_id>/',views.get_request_status,name="Request Status"),
     path('gettrainerinfo/<str:trainer_id>/<str:coach_id>/',views.get_trainer_info,name="Get Trainer Info"),
     path('sendjoinrequest2/<str:trainer_id>/<str:coach_id>/',views.send_join_request22,name="Send Join Request"),
+    path('update_image/<str:user_id>/',views.UpdateProfileImage.as_view(),name="update profile"),
 ]

@@ -628,4 +628,54 @@ def get_trainer_info(request,trainer_id,coach_id):
     #الممرر id اذا كان مافي بروفايل لهاد ال 
     except Profile.DoesNotExist:
         return Response({"error": "Profile not found"}, status=404)
-    
+
+
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Profile
+import cloudinary.uploader
+import json
+import urllib.request
+
+class UpdateProfileImage(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, user_id):
+        try:
+            image = request.FILES.get("image")
+            if not image:
+                return Response({"error": "No image provided"}, status=400)
+
+            upload_result = cloudinary.uploader.upload(image)
+            image_url = upload_result["secure_url"]
+
+            # بناء بيانات JSON
+            data = json.dumps({"image_url": image_url}).encode('utf-8')
+
+            # عنوان الـ API الذي تريد الاتصال به
+            update_url = f"https://mohammedmoh.pythonanywhere.com/update_image/{user_id}/"
+
+            # إعدادات الطلب
+            req = urllib.request.Request(
+                update_url,
+                data=data,
+                headers={'Content-Type': 'application/json'},
+                method='POST'
+            )
+
+            # إرسال الطلب وقراءة الرد
+            with urllib.request.urlopen(req) as response:
+                resp_data = response.read().decode('utf-8')
+
+            return Response({
+                "message": "Image uploaded and profile updated successfully",
+                "image_url": image_url,
+                "update_response": resp_data
+            })
+
+        except Profile.DoesNotExist:
+            return Response({"error": "Profile not found"}, status=404)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)

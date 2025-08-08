@@ -67,6 +67,14 @@ REST_FRAMEWORK = {
     ],
 }
 
+# img cloud storage
+import cloudinary
+cloudinary.config(
+    cloud_name = 'dihberqmu',
+    api_key = '139238618629431',
+    api_secret = 'HYAtd2lbAQJdF8q0foLgpnI_e9Q'
+)
+
 # sittings
 SIMPLE_JWT ={
     'ACCESS_TOKEN_LIFETIME':timedelta(days=365),

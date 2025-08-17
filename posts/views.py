@@ -234,3 +234,65 @@ def get_comments_on_post(request,post_id):
     serializer = CommentSerializer(comment,many=True)
 
     return Response(serializer.data)
+
+
+    
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Profile
+import cloudinary.uploader
+import json
+import urllib.request
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+import cloudinary.uploader
+import json
+import urllib.request
+
+class AddPostWithImage2(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, author_id):
+        try:
+            image = request.FILES.get("image")  # optional
+            content = request.data.get("content", "")  # text (can be empty)
+
+            image_url = None
+            if image:  # upload only if provided
+                upload_result = cloudinary.uploader.upload(image)
+                image_url = upload_result["secure_url"]
+
+            # build payload
+            payload = {
+                "content": content,
+            }
+            if image_url:
+                payload["image_url"] = image_url
+
+            data = json.dumps(payload).encode("utf-8")
+
+            # API to update
+            update_url = f"https://mohammedmoh.pythonanywhere.com/posts/addpost_with_image/{author_id}/"
+
+            req = urllib.request.Request(
+                update_url,
+                data=data,
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+
+            with urllib.request.urlopen(req) as response:
+                resp_data = response.read().decode("utf-8")
+
+            return Response({
+                "message": "Post uploaded successfully",
+                "image_url": image_url,
+                "content": content,
+                "update_response": resp_data
+            })
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)

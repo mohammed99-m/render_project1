@@ -8,7 +8,7 @@ urlpatterns = [
   path('getallposts/',get_all_posts,name="Get All Post"),
   path('getsomeoneposts/<str:user_id>/',get_someone_posts,name='Get Someone Post'),
   path('getcommentsonpost/<str:post_id>/',get_comments_on_post,name="Get Comments On Post"),
-  path('add_post/<int:user_id>/', AddPostWithImage2.as_view(), name='add_post'),
+  path('add_post/<int:author_id>/', AddPostWithImage2.as_view(), name='add_post'),
 ]
 
 

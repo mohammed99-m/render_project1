@@ -241,3 +241,61 @@ def get_exercises_by_muscle(request):
 
     serializer = ExerciseSerializer(exercises, many=True)  
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework import status
+import cloudinary.uploader
+import urllib.request
+import json
+
+@api_view(["POST"])
+@parser_classes([MultiPartParser, FormParser])
+def add_exercise_with_video(request):
+    # Get fields from request
+    name = request.data.get("name")
+    muscle_group = request.data.get("muscle_group")
+    description = request.data.get("description")
+    video = request.FILES.get("video")  # optional
+
+    video_url = None
+    if video:
+        try:
+            # Upload to Cloudinary
+            upload_result = cloudinary.uploader.upload(
+                video,
+                resource_type="video"
+            )
+            video_url = upload_result.get("secure_url")
+        except Exception as e:
+            return Response({"error": f"Video upload failed: {str(e)}"}, status=500)
+
+    # Prepare data to send (video_url may be None)
+    data_to_send = {
+        "name": name,
+        "muscle_group": muscle_group,
+        "description": description,
+        "video_url": video_url  # can be None
+    }
+
+    # Send POST request to external server
+    try:
+        url = "https://mohammedmoh.pythonanywhere.com/exercises/add-exercise-with-video/"
+        headers = {"Content-Type": "application/json"}
+        data = json.dumps(data_to_send).encode("utf-8")
+
+        req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+        with urllib.request.urlopen(req) as response:
+            external_response = response.read().decode("utf-8")
+    except Exception as e:
+        return Response({
+            "request_data": data_to_send,
+            "external_error": str(e)
+        }, status=status.HTTP_201_CREATED)
+
+    return Response({
+        "request_data": data_to_send,
+        "external_response": external_response
+    }, status=status.HTTP_201_CREATED)
+

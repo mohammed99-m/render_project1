@@ -251,6 +251,7 @@ from rest_framework.response import Response
 import cloudinary.uploader
 import json
 import urllib.request
+import traceback
 
 class AddPostWithImage2(APIView):
     parser_classes = [MultiPartParser, FormParser]
@@ -295,4 +296,8 @@ class AddPostWithImage2(APIView):
             })
 
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            return Response({
+                "error": str(e),
+                "type": type(e).__name__,
+                "details": traceback.format_exc()
+            }, status=500)

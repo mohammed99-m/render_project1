@@ -95,7 +95,7 @@ from rest_framework import status
 def like_on_post(request, post_id, user_id,author_id):
     user_url=""
     like_post_url = f"https://mohammedmoh.pythonanywhere.com/posts/like/{post_id}/{user_id}/"
-    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{author_id}/{user_id}"
+    send_notification_url = f"https://web-production-830a0.up.railway.app/notification/send-save-notifications/{author_id}/{user_id}"
         # Send POST request to like the post
     headers = {'Content-Type': 'application/json'}
     req = urllib.request.Request(like_post_url, method='POST',headers=headers)
@@ -154,7 +154,7 @@ def like_on_post(request, post_id, user_id,author_id):
 def add_comment(request, post_id, user_id,author_id):
     user_url=""
     comment_on_post_url = f"https://mohammedmoh.pythonanywhere.com/posts/addcomment/{post_id}/{user_id}/"
-    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{author_id}/{user_id}"
+    send_notification_url = f"https://web-production-830a0.up.railway.app/notification/send-save-notifications/{author_id}/{user_id}"
         # Send POST request to like the post
     headers = {'Content-Type': 'application/json'}
     comment_data = json.dumps({"text": request.data['text']}).encode('utf-8')

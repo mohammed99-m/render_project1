@@ -183,7 +183,7 @@ def SendMessageView2(request,user_id):
 #يرسل الاشعار للمستقبل ويحفظها في الداتا بيز الرئيسية
         if receiver_id:
             notification_message = f"You have a new message"
-            notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{receiver_id}/{sender_id}"
+            notification_url = f"https://web-production-830a0.up.railway.app/notification/send-save-notifications/{receiver_id}/{sender_id}"
 
 
             notification_data=json.dumps({

@@ -284,7 +284,7 @@ import urllib.error
 def send_join_request22(request, trainer_id, coach_id):
     send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/sendjoinrequest/{trainer_id}/{coach_id}/"
     notification_url = "https://mohammedmoh.pythonanywhere.com/notifications/save-notification/"
-    websocket_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{coach_id}/{trainer_id}"
+    websocket_notification_url = f"https://web-production-830a0.up.railway.app/notification/send-save-notifications/{coach_id}/{trainer_id}"
 
     headers = {'Content-Type': 'application/json'}
 
@@ -365,7 +365,7 @@ import time
 @api_view(['POST'])
 def send_join_request(request, trainer_id, coach_id):
     send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/sendjoinrequest/{trainer_id}/{coach_id}/"
-    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{coach_id}/{trainer_id}"
+    send_notification_url = f"https://web-production-830a0.up.railway.app/notification/send-save-notifications/{coach_id}/{trainer_id}"
 
     headers = {'Content-Type': 'application/json'}
     result_response = {
@@ -478,7 +478,7 @@ from .models import JoinRequest
 @api_view(['POST'])
 def response_to_join_request(request,request_id,coach_id,trainer_id):
     send_join_request_url = f"https://mohammedmoh.pythonanywhere.com/responsetojoinrequest/{coach_id}/{request_id}/"
-    send_notification_url = f"https://render-project1-qyk2.onrender.com/notification/send-save-notifications/{trainer_id}/{coach_id}"
+    send_notification_url = f"https://web-production-830a0.up.railway.app/notification/send-save-notifications/{trainer_id}/{coach_id}"
         # Send POST request to like the post
     headers = {'Content-Type': 'application/json'}
     join_request_data = json.dumps({"action": request.data['action']}).encode('utf-8')

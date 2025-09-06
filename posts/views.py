@@ -301,3 +301,20 @@ class AddPostWithImage2(APIView):
                 "type": type(e).__name__,
                 "details": traceback.format_exc()
             }, status=500)
+
+
+@api_view(['GET'])
+def test_connection(request):
+    import urllib.request, traceback
+    url = "https://mohammedmoh.pythonanywhere.com/"
+    try:
+        with urllib.request.urlopen(url, timeout=5) as response:
+            return Response({
+                "status": response.status,
+                "body": response.read().decode()[:200]  # first 200 chars
+            })
+    except Exception as e:
+        return Response({
+            "error": str(e),
+            "trace": traceback.format_exc()
+        }, status=500)

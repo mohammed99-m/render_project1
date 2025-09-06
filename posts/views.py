@@ -277,7 +277,7 @@ class AddPostWithImage2(APIView):
 
             # API to update
             update_url = f"https://mohammedmoh.pythonanywhere.com/posts/addpost_with_image/{author_id}/"
-
+            print("Trying to reach:", update_url)
             req = urllib.request.Request(
                 update_url,
                 data=data,

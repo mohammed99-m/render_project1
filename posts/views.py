@@ -259,7 +259,7 @@ class AddPostWithImage2(APIView):
     def post(self, request, author_id):
         try:
             image = request.FILES.get("image")  # optional
-            content = request.data.get("content", "")  # text (can be empty)
+            content = request.data.get("content")  # text (can be empty)
 
             image_url = None
             if image:  # upload only if provided

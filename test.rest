@@ -482,3 +482,14 @@ Content-Type: application/json
 {
     
 }
+
+### Send message via JSON API
+POST http://127.0.0.1:8000/main/api/send-message/
+Content-Type: application/json
+X-CSRFToken:DqXm8MZo6qo926kYWwgW2rL0HlF5wZSw
+
+{
+  "user_name": "Ali",
+  "user_email": "markoriobrazil@gmail.com",
+  "message": "مرحبا! هذه رسالة تجريبية2."
+}

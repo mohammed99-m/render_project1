@@ -300,6 +300,7 @@ def add_exercise_with_video(request):
     }, status=status.HTTP_201_CREATED)
 
 
+#########################################################################################################
 
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -361,3 +362,95 @@ def add_service_with_media(request):
         "external_response": external_response
     
     }, status=status.HTTP_201_CREATED)
+
+
+from django.views.decorators.csrf import csrf_protect
+@csrf_protect
+def api_send_message4(request):
+    """
+    - POST (JSON/AJAX): يعالج البيانات القادمة من الموبايل أو الواجهة الأمامية
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON."}, status=400)
+
+    data = {
+        "user_name": payload.get("user_name", ""),
+        "user_email": payload.get("user_email", ""),
+        "message": payload.get("message", ""),
+    }
+    return _process_contact_data(request, data)
+def _process_contact_data(request, data):
+    """
+    دالة مشتركة: تحقق من المدخلات + تخزين + إرسال إيميل
+    """
+    raw_name = (data.get("user_name") or "").strip()
+    raw_email = (data.get("user_email") or "").strip()
+    raw_message = (data.get("message") or "").strip()
+
+    if not raw_message:
+        return _response_by_request_type(request, {"error": "Message cannot be empty."}, status=400)
+
+    if len(raw_name) > MAX_NAME_LEN or len(raw_email) > MAX_EMAIL_LEN or len(raw_message) > MAX_MESSAGE_LEN:
+        return _response_by_request_type(request, {"error": "One of the fields is too long."}, status=400)
+
+    for val in (raw_name, raw_email):
+        if HEADER_INJECTION_RE.search(val):
+            return _response_by_request_type(request, {"error": "Invalid characters in input."}, status=400)
+
+    try:
+        validate_email(raw_email)
+    except ValidationError:
+        return _response_by_request_type(request, {"error": "Invalid email address."}, status=400)
+
+    safe_name = escape(raw_name)
+    safe_message = escape(raw_message)
+
+    try:
+        UserMessage.objects.create(
+            user_name=safe_name,
+            user_email=raw_email,
+            message=safe_message
+        )
+    except Exception as e:
+        logger.exception("Failed to save UserMessage")
+        return _response_by_request_type(request, {"error": "Failed to save message."}, status=500)
+
+    subject = f"رسالة من {raw_name or 'مستخدم مجهول'}"
+    full_message = f"رسالة من: {raw_name} <{raw_email}>\n\n{raw_message}"
+
+    try:
+        email = EmailMessage(
+              subject=subject,
+              body=full_message,
+              from_email=settings.EMAIL_HOST_USER,   # البريد المرسل منه
+              to=[settings.ADMIN_EMAIL],             # البريد المستلم (حدد في settings.py)
+              reply_to=[raw_email],                  # البريد الذي يرد عليه
+)
+        email.send(fail_silently=False)
+    except BadHeaderError:
+        return _response_by_request_type(request, {"error": "Invalid header found."}, status=400)
+    except Exception:
+        logger.exception("Failed to send email")
+        return _response_by_request_type(request, {"error": "Failed to send email."}, status=500)
+
+    return _response_by_request_type(request, {"status": "Message sent successfully."}, status=200)
+
+
+def _response_by_request_type(request, payload, status=200):
+    """
+    يرجع JSON لو الطلب AJAX/JSON
+    ويرجع HTML لو كان من فورم عادي
+    """
+    if request.content_type == "application/json" or "application/json" in request.META.get("HTTP_ACCEPT", ""):
+        return JsonResponse(payload, status=status)
+
+    if status == 200:
+        return render(request, "contact.html", {"success": payload.get("status", "")})
+    else:
+        return render(request, "contact.html", {"error": payload.get("error", "")}, status=status)
+

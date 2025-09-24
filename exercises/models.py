@@ -33,3 +33,10 @@ class ExerciseSchedule(models.Model):
 
     def __str__(self):
         return f"{self.exercise.name} on {self.day} for {self.program.description} - Sets: {self.sets}, Reps: {self.reps}"
+    
+
+class UserMessage(models.Model):
+    user_name = models.CharField(max_length=100)
+    user_email = models.EmailField(blank=True, null=True)
+    message = models.TextField(max_length=1000)
+    sent_at = models.DateTimeField(auto_now_add=True)

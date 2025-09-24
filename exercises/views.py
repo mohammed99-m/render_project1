@@ -1,8 +1,9 @@
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Exercise, ExerciseSchedule , Program
+from .models import Exercise, ExerciseSchedule , Program, UserMessage
 from .serializers import ExerciseSerializer , ProgramSerializer
 from accounts.models import Profile
 
@@ -363,7 +364,32 @@ def add_service_with_media(request):
     
     }, status=status.HTTP_201_CREATED)
 
+from django.conf import settings
+from django.core.mail import EmailMessage, BadHeaderError
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.utils.html import escape
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+import json
+import re
+import logging
+from django.conf import settings
+from django.core.mail import EmailMessage, BadHeaderError
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.utils.html import escape
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 
+logger = logging.getLogger(__name__)
+
+HEADER_INJECTION_RE = re.compile(r'[\r\n]')
+MAX_NAME_LEN = 120
+MAX_EMAIL_LEN = 254
+MAX_MESSAGE_LEN = 5000
 from django.views.decorators.csrf import csrf_protect
 @csrf_protect
 def api_send_message4(request):

@@ -299,3 +299,96 @@ def add_exercise_with_video(request):
         "external_response": external_response
     }, status=status.HTTP_201_CREATED)
 
+
+
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework import status
+import cloudinary.uploader
+import urllib.request
+import uuid
+import mimetypes
+
+@api_view(["POST"])
+@parser_classes([MultiPartParser, FormParser])
+def add_service_with_media(request):
+    name = request.data.get("name")
+    content = request.data.get("content")
+    date = request.data.get("date")
+    image = request.FILES.get("image")
+    video = request.FILES.get("video")
+
+    # رفع الصور والفيديوهات إلى Cloudinary
+    image_url = None
+    video_url = None
+
+    try:
+        if image:
+            upload_image = cloudinary.uploader.upload(image, resource_type="image")
+            image_url = upload_image.get("secure_url")
+        if video:
+            upload_video = cloudinary.uploader.upload(video, resource_type="video")
+            video_url = upload_video.get("secure_url")
+    except Exception as e:
+        return Response({"error": f"Media upload failed: {str(e)}"}, status=500)
+
+    # تجهيز البيانات
+    fields = {
+        "name": name,
+        "content": content,
+        "date": date,
+        "image_url": image_url or "",
+        "video_url": video_url or ""
+    }
+
+    # multipart/form-data باستخدام urllib
+    boundary = str(uuid.uuid4())
+    CRLF = "\r\n"
+    body = []
+
+    for key, value in fields.items():
+        body.append(f"--{boundary}")
+        body.append(f'Content-Disposition: form-data; name="{key}"')
+        body.append("")
+        body.append(str(value))
+
+    # إضافة ملفات (image + video)
+    files = []
+    if image:
+        files.append(("image", image.name, image.read(), image.content_type))
+    if video:
+        files.append(("video", video.name, video.read(), video.content_type))
+
+    for key, filename, filedata, content_type in files:
+        body.append(f"--{boundary}")
+        body.append(f'Content-Disposition: form-data; name="{key}"; filename="{filename}"')
+        body.append(f"Content-Type: {content_type}")
+        body.append("")
+        body.append(filedata.decode("ISO-8859-1") if isinstance(filedata, bytes) else filedata)
+
+    body.append(f"--{boundary}--")
+    body.append("")
+    body_bytes = CRLF.join(body).encode("ISO-8859-1")
+
+    req = urllib.request.Request(
+        url="https://mohammed229.pythonanywhere.com/main/addservice_with_video/",
+        data=body_bytes,
+        method="POST"
+    )
+    req.add_header("Content-Type", f"multipart/form-data; boundary={boundary}")
+
+    try:
+        with urllib.request.urlopen(req) as response:
+            external_response = response.read().decode()
+    except Exception as e:
+        return Response({
+            "request_data": fields,
+            "external_error": str(e)
+        }, status=status.HTTP_201_CREATED)
+
+    return Response({
+        "request_data": fields,
+        "external_response": external_response
+    
+    }, status=status.HTTP_201_CREATED)

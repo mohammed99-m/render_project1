@@ -266,10 +266,8 @@ Content-Type: application/json
 
 ###
 
-Post http://127.0.0.1:8000/posts/addpost/6/
+Post http://127.0.0.1:8000/posts/add_post/1/
 Content-Type: application/json
-## Token instated of Bearer for normal token
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc3OTE4Nzk4LCJpYXQiOjE3NDYzODI3OTgsImp0aSI6ImU2Y2Y3NWYwNDEyMzQ0M2E5ZGVkMWVjYjQ1OGQxMDE3IiwidXNlcl9pZCI6Nn0.ROSJczURBaOQ5LnOQflofcbePdvRJiUWoJk3TJ5E85c
 
 {
   "content":"test time"

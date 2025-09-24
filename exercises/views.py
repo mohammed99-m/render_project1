@@ -342,45 +342,14 @@ def add_service_with_media(request):
         "video_url": video_url or ""
     }
 
-    # multipart/form-data باستخدام urllib
-    boundary = str(uuid.uuid4())
-    CRLF = "\r\n"
-    body = []
-
-    for key, value in fields.items():
-        body.append(f"--{boundary}")
-        body.append(f'Content-Disposition: form-data; name="{key}"')
-        body.append("")
-        body.append(str(value))
-
-    # إضافة ملفات (image + video)
-    files = []
-    if image:
-        files.append(("image", image.name, image.read(), image.content_type))
-    if video:
-        files.append(("video", video.name, video.read(), video.content_type))
-
-    for key, filename, filedata, content_type in files:
-        body.append(f"--{boundary}")
-        body.append(f'Content-Disposition: form-data; name="{key}"; filename="{filename}"')
-        body.append(f"Content-Type: {content_type}")
-        body.append("")
-        body.append(filedata.decode("ISO-8859-1") if isinstance(filedata, bytes) else filedata)
-
-    body.append(f"--{boundary}--")
-    body.append("")
-    body_bytes = CRLF.join(body).encode("ISO-8859-1")
-
-    req = urllib.request.Request(
-        url="https://mohammed229.pythonanywhere.com/main/addservice_with_video/",
-        data=body_bytes,
-        method="POST"
-    )
-    req.add_header("Content-Type", f"multipart/form-data; boundary={boundary}")
 
     try:
+        url = "https://mohammed229.pythonanywhere.com/main/addservice_with_video/"
+        headers = {"Content-Type": "application/json"}
+        data = json.dumps(fields).encode("utf-8")
+        req = urllib.request.Request(url, data=data, headers=headers, method="POST")
         with urllib.request.urlopen(req) as response:
-            external_response = response.read().decode()
+            external_response = response.read().decode("utf-8")
     except Exception as e:
         return Response({
             "request_data": fields,

@@ -14,5 +14,5 @@ urlpatterns = [
    path('updateprogram/<str:coach_id>/<str:program_id>/',update_program,name="Update Program"),
    path('updateprogrampyday/<str:coach_id>/<str:program_id>/',update_program_by_days,name="Update Program By Days"),
    path('add-exercise-with-video/',add_exercise_with_video,name="exercise with video"),
-   path('add-service-with-video/',add_service_with_media,name="mj2"),
+   path('add-service-with-video/',add_service_with_media,name="mj22"),
 ]

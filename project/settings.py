@@ -195,14 +195,32 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.example.com")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
-EMAIL_HOST_USER = "markoriobrazil@gmail.com"   # always use this
-EMAIL_HOST_PASSWORD = "awds hhuk dvnz fapi"
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.example.com")
+# EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
+# EMAIL_HOST_USER = "markoriobrazil@gmail.com"   # always use this
+# EMAIL_HOST_PASSWORD = "awds hhuk dvnz fapi"
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
 
-# Fixed sender and receiver
+# # Fixed sender and receiver
+# DEFAULT_FROM_EMAIL = "markoriobrazil@gmail.com"
+# ADMIN_EMAIL = "md3393911@gmail.com"
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ---------------- Email Settings ----------------
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False  # Gmail uses TLS on port 587
+EMAIL_HOST_USER = "markoriobrazil@gmail.com"
+EMAIL_HOST_PASSWORD = "awds hhuk dvnz fapi"  # Use Gmail App Password
+
+# Always send from this email
 DEFAULT_FROM_EMAIL = "markoriobrazil@gmail.com"
+
+# Always send to this email
 ADMIN_EMAIL = "md3393911@gmail.com"

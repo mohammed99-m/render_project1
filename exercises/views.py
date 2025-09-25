@@ -364,17 +364,11 @@ def add_service_with_media(request):
     
     }, status=status.HTTP_201_CREATED)
 
-from django.conf import settings
-from django.core.mail import EmailMessage, BadHeaderError
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
-from django.http import JsonResponse
-from django.shortcuts import render
-from django.utils.html import escape
-from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 import json
 import re
 import logging
+import traceback
+
 from django.conf import settings
 from django.core.mail import EmailMessage, BadHeaderError
 from django.core.validators import validate_email
@@ -382,38 +376,70 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.html import escape
-from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_protect
 
 logger = logging.getLogger(__name__)
+
+# Replace with your actual model import
+# from myapp.models import UserMessage
+try:
+    from .models import UserMessage  # <- change 'app' to your app name
+except Exception:
+    UserMessage = None
+    logger.warning("UserMessage model not imported; saving to DB will be skipped until you fix import.")
 
 HEADER_INJECTION_RE = re.compile(r'[\r\n]')
 MAX_NAME_LEN = 120
 MAX_EMAIL_LEN = 254
 MAX_MESSAGE_LEN = 5000
-from django.views.decorators.csrf import csrf_protect
+
+
 @csrf_protect
 def api_send_message4(request):
     """
-    - POST (JSON/AJAX): يعالج البيانات القادمة من الموبايل أو الواجهة الأمامية
+    Accepts POST requests from JSON/AJAX or form submissions.
+    Returns JSON for AJAX/JSON clients, or renders the contact page for regular form posts.
     """
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
 
+    # --- debug logging to inspect what arrived ---
+    logger.debug("api_send_message4 called. Content-Type=%s, Content-Length=%s",
+                 request.content_type, request.META.get("CONTENT_LENGTH"))
     try:
-        payload = json.loads(request.body.decode("utf-8"))
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "Invalid JSON."}, status=400)
+        raw_body = request.body.decode("utf-8")
+    except Exception as e:
+        raw_body = f"<unable to decode body: {e}>"
+    logger.debug("Raw body: %s", raw_body)
+
+    # --- parse payload: prefer JSON if it looks like JSON, otherwise fallback to form-data ---
+    payload = None
+    ct = (request.content_type or "").lower()
+    if "application/json" in ct or (raw_body and raw_body.strip().startswith(('{', '['))):
+        try:
+            payload = json.loads(raw_body or "{}")
+        except json.JSONDecodeError as e:
+            logger.warning("JSON decode failed: %s; body: %s", e, raw_body)
+            return _response_by_request_type(request, {"error": "Invalid JSON.", "detail": str(e)}, status=400)
+
+    if payload is None:
+        # handle form-encoded or multipart
+        payload = {
+            "user_name": request.POST.get("user_name", ""),
+            "user_email": request.POST.get("user_email", ""),
+            "message": request.POST.get("message", ""),
+        }
 
     data = {
-        "user_name": payload.get("user_name", ""),
-        "user_email": payload.get("user_email", ""),
-        "message": payload.get("message", ""),
+        "user_name": payload.get("user_name", "") or "",
+        "user_email": payload.get("user_email", "") or "",
+        "message": payload.get("message", "") or "",
     }
+
     return _process_contact_data(request, data)
+
+
 def _process_contact_data(request, data):
-    """
-    دالة مشتركة: تحقق من المدخلات + تخزين + إرسال إيميل
-    """
     raw_name = (data.get("user_name") or "").strip()
     raw_email = (data.get("user_email") or "").strip()
     raw_message = (data.get("message") or "").strip()
@@ -436,32 +462,45 @@ def _process_contact_data(request, data):
     safe_name = escape(raw_name)
     safe_message = escape(raw_message)
 
-    try:
-        UserMessage.objects.create(
-            user_name=safe_name,
-            user_email=raw_email,
-            message=safe_message
-        )
-    except Exception as e:
-        logger.exception("Failed to save UserMessage")
-        return _response_by_request_type(request, {"error": "Failed to save message."}, status=500)
+    # save to DB if model available
+    if UserMessage is not None:
+        try:
+            UserMessage.objects.create(
+                user_name=safe_name,
+                user_email=raw_email,
+                message=safe_message
+            )
+        except Exception:
+            logger.exception("Failed to save UserMessage")
+            # don't fail the whole request for DB save problems — still try to send email
+            # but return an error if you prefer stricter behavior
+    else:
+        logger.info("UserMessage model not configured; skipping DB save.")
 
     subject = f"رسالة من {raw_name or 'مستخدم مجهول'}"
     full_message = f"رسالة من: {raw_name} <{raw_email}>\n\n{raw_message}"
 
+    # Use sensible fallbacks if settings not configured
+    from_email = getattr(settings, "EMAIL_HOST_USER", None) or getattr(settings, "DEFAULT_FROM_EMAIL", None) or "no-reply@example.com"
+    admin_email = getattr(settings, "ADMIN_EMAIL", None) or getattr(settings, "DEFAULT_ADMIN_EMAIL", None) or from_email
+
     try:
         email = EmailMessage(
-              subject=subject,
-              body=full_message,
-              from_email=settings.EMAIL_HOST_USER,   # البريد المرسل منه
-              to=[settings.ADMIN_EMAIL],             # البريد المستلم (حدد في settings.py)
-              reply_to=[raw_email],                  # البريد الذي يرد عليه
-)
+            subject=subject,
+            body=full_message,
+            from_email=from_email,
+            to=[admin_email],
+            reply_to=[raw_email],
+        )
         email.send(fail_silently=False)
     except BadHeaderError:
         return _response_by_request_type(request, {"error": "Invalid header found."}, status=400)
-    except Exception:
-        logger.exception("Failed to send email")
+    except Exception as e:
+        # full traceback into logs; return more detail if DEBUG
+        tb = traceback.format_exc()
+        logger.exception("Failed to send email: %s\nTrace: %s", e, tb)
+        if getattr(settings, "DEBUG", False):
+            return _response_by_request_type(request, {"error": "Failed to send email.", "detail": str(e), "trace": tb}, status=500)
         return _response_by_request_type(request, {"error": "Failed to send email."}, status=500)
 
     return _response_by_request_type(request, {"status": "Message sent successfully."}, status=200)
@@ -469,14 +508,14 @@ def _process_contact_data(request, data):
 
 def _response_by_request_type(request, payload, status=200):
     """
-    يرجع JSON لو الطلب AJAX/JSON
-    ويرجع HTML لو كان من فورم عادي
+    Return JSON if request looks like AJAX/JSON.
+    Otherwise render the contact.html template.
     """
-    if request.content_type == "application/json" or "application/json" in request.META.get("HTTP_ACCEPT", ""):
+    accepts = request.META.get("HTTP_ACCEPT", "")
+    if request.content_type == "application/json" or "application/json" in accepts:
         return JsonResponse(payload, status=status)
 
     if status == 200:
         return render(request, "contact.html", {"success": payload.get("status", "")})
     else:
         return render(request, "contact.html", {"error": payload.get("error", "")}, status=status)
-

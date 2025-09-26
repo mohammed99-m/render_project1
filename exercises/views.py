@@ -348,7 +348,7 @@ def add_service_with_media(request):
 
     try:
         url = "https://mohammed229.pythonanywhere.com/main/addservice_with_video/"
-        headers = {"Content-Type": "application/json","Authorization": f"Token {token}"}
+        headers = {"Content-Type": "application/json","Authorization": f"Bearer {token}"}
         data = json.dumps(fields).encode("utf-8")
         req = urllib.request.Request(url, data=data, headers=headers, method="POST")
         with urllib.request.urlopen(req) as response:

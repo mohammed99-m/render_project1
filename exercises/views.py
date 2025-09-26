@@ -320,6 +320,7 @@ def add_service_with_media(request):
     date = request.data.get("date")
     image = request.FILES.get("image")
     video = request.FILES.get("video")
+    token = request.data.get("token")  
 
     # رفع الصور والفيديوهات إلى Cloudinary
     image_url = None
@@ -347,7 +348,7 @@ def add_service_with_media(request):
 
     try:
         url = "https://mohammed229.pythonanywhere.com/main/addservice_with_video/"
-        headers = {"Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json","Authorization": f"Token {token}"}
         data = json.dumps(fields).encode("utf-8")
         req = urllib.request.Request(url, data=data, headers=headers, method="POST")
         with urllib.request.urlopen(req) as response:
@@ -363,6 +364,8 @@ def add_service_with_media(request):
         "external_response": external_response
     
     }, status=status.HTTP_201_CREATED)
+
+
 
 import json
 import re
